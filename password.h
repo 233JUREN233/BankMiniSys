@@ -1,5 +1,14 @@
-//密码加密（简易哈希）、登录验证（密码校验+失败锁定）；
-// - 辅助：账户挂失状态标记（挂失后禁止交易）。
 
+// 密码加密函数声明
+void simple_hash(const char *input, char *output);
 
-
+// 密码加密函数实现
+#include <stdio.h>
+void simple_hash(const char *input, char *output)
+{
+	unsigned int hash = 5381;
+	int c;
+	while ((c = *input++))
+		hash = ((hash << 5) + hash) + c;
+	sprintf(output, "%08x", hash);
+}
