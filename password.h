@@ -14,7 +14,7 @@ void password_md5(const char *input, char *output)
 }
 
 // 密码比较函数
-void cmp_password(const char *input, const char *stored_pssword)
+void cmp_password(const char *input, const char *password)
 {
 	MD5_CTX ctx;
 	unsigned char digest[16];
