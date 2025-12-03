@@ -1,21 +1,24 @@
-#include<stdio.h>
-#include<global.h>
-#include<login.h>
+#include <stdio.h>
+#include <global.h>
+#include <login.h>
 
 // 辅助函数1：校验金额是否合法（>0，处理浮点数精度）
-static int isValidAmount(double amount) {
+static int isValidAmount(double amount)
+{
     return (amount > 0.0001) ? 1 : 0;
 }
 
 // 辅助函数2：获取当前时间（格式：YYYY-MM-DD HH:MM）
-static void getCurrentTime(char* time_buf, int buf_len) {
+static void getCurrentTime(char *time_buf, int buf_len)
+{
     time_t now = time(NULL);
-    struct tm* tm_info = localtime(&now);
+    struct tm *tm_info = localtime(&now);
     strftime(time_buf, buf_len, "%Y-%m-%d %H:%M", tm_info);
 }
 
 // 辅助函数3：校验交易密码
-static int verifyTradePwd(const char* input_pwd, const char* stored_pwd_hash) {
+static int verifyTradePwd(const char *input_pwd, const char *stored_pwd_hash)
+{
     char input_pwd_hash[33]; // MD5加密后32位字符串
     password_md5(input_pwd, input_pwd_hash);
     // 比对输入密码的哈希值和账户存储的哈希值
@@ -23,9 +26,11 @@ static int verifyTradePwd(const char* input_pwd, const char* stored_pwd_hash) {
 }
 
 // 辅助功能：生成交易记录（插入全局链表）
-void createTransactionRecord(const char* acc_id, TransType type, double amount, const char* target_acc) {
-    Transaction* new_trans = (Transaction*)malloc(sizeof(Transaction));
-    if (new_trans == NULL) {
+void createTransactionRecord(const char *acc_id, TransType type, double amount, const char *target_acc)
+{
+    Transaction *new_trans = (Transaction *)malloc(sizeof(Transaction));
+    if (new_trans == NULL)
+    {
         printf("交易记录生成失败：内存分配失败！\n");
         return;
     }
@@ -41,37 +46,44 @@ void createTransactionRecord(const char* acc_id, TransType type, double amount, 
     new_trans->next = trans_head;
     trans_head = new_trans;
     // 打印记录（便于调试）
-    const char* type_str = (type == TRANS_DEPOSIT) ? "存款" : (type == TRANS_WITHDRAW) ? "取款" : "转账";
+    const char *type_str = (type == TRANS_DEPOSIT) ? "存款" : (type == TRANS_WITHDRAW) ? "取款"
+                                                                                       : "转账";
     printf("交易记录：%s | %s | 金额%.2f | 对方账号：%s\n",
            new_trans->time, type_str, amount, new_trans->target_acc);
 }
 
 // 功能1：存款（需登录+账户正常+金额合法+可选密码校验）
-int deposit(double amount, const char* trade_pwd) {
+int deposit(double amount, const char *trade_pwd)
+{
     // 1. 校验登录状态
-    if (strlen(current_login_acc) == 0) {
+    if (strlen(current_login_acc) == 0)
+    {
         printf("存款失败：请先登录！\n");
         return 1;
     }
     // 2. 调用find_account查找账户
-    Account* curr_acc = find_account(current_login_acc);
-    if (curr_acc == NULL) {
+    Account *curr_acc = find_account(current_login_acc);
+    if (curr_acc == NULL)
+    {
         printf("存款失败：当前登录账号不存在！\n");
         return 2;
     }
     // 3. 校验账户状态
-    if (curr_acc->status != ACC_NORMAL) {
+    if (curr_acc->status != ACC_NORMAL)
+    {
         printf("存款失败：账户状态异常(%s)!\n",
                curr_acc->status == ACC_FROZEN ? "冻结" : "挂失");
         return 3;
     }
     // 4. 校验金额
-    if (!isValidAmount(amount)) {
+    if (!isValidAmount(amount))
+    {
         printf("存款失败:金额必须大于0!\n");
         return 4;
     }
     // 5. 校验交易密码（可选，若团队要求交易需二次验证）
-    if (trade_pwd != NULL && !verifyTradePwd(trade_pwd, curr_acc->pwd_hash)) {
+    if (trade_pwd != NULL && !verifyTradePwd(trade_pwd, curr_acc->pwd_hash))
+    {
         printf("存款失败：交易密码错误！\n");
         return 5;
     }
@@ -85,37 +97,44 @@ int deposit(double amount, const char* trade_pwd) {
 }
 
 // 功能2：取款（需登录+账户正常+金额合法+余额充足+可选密码校验）
-int withdraw(double amount, const char* trade_pwd) {
+int withdraw(double amount, const char *trade_pwd)
+{
     // 1. 校验登录状态
-    if (strlen(current_login_acc) == 0) {
+    if (strlen(current_login_acc) == 0)
+    {
         printf("取款失败：请先登录！\n");
         return 1;
     }
     // 2. 调用团队find_account查找账户
-    Account* curr_acc = find_account(current_login_acc);
-    if (curr_acc == NULL) {
+    Account *curr_acc = find_account(current_login_acc);
+    if (curr_acc == NULL)
+    {
         printf("取款失败：当前登录账号不存在！\n");
         return 2;
     }
     // 3. 校验账户状态
-    if (curr_acc->status != ACC_NORMAL) {
+    if (curr_acc->status != ACC_NORMAL)
+    {
         printf("取款失败：账户状态异常(%s)!\n",
                curr_acc->status == ACC_FROZEN ? "冻结" : "挂失");
         return 3;
     }
     // 4. 校验金额
-    if (!isValidAmount(amount)) {
+    if (!isValidAmount(amount))
+    {
         printf("取款失败:金额必须大于0!\n");
         return 4;
     }
     // 5. 校验余额
-    if (curr_acc->balance < amount) {
+    if (curr_acc->balance < amount)
+    {
         printf("取款失败：余额不足！当前余额：%.2f,需取款：%.2f\n",
                curr_acc->balance, amount);
         return 5;
     }
     // 6. 校验交易密码（可选）
-    if (trade_pwd != NULL && !verifyTradePwd(trade_pwd, curr_acc->pwd_hash)) {
+    if (trade_pwd != NULL && !verifyTradePwd(trade_pwd, curr_acc->pwd_hash))
+    {
         printf("取款失败：交易密码错误！\n");
         return 6;
     }
@@ -129,38 +148,45 @@ int withdraw(double amount, const char* trade_pwd) {
 }
 
 // 功能3：转账（需登录+双方账户正常+金额合法+余额充足+可选密码校验）
-int transfer(const char* target_acc_id, double amount, const char* trade_pwd) {
+int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
+{
     // 1. 校验登录状态
-    if (strlen(current_login_acc) == 0) {
+    if (strlen(current_login_acc) == 0)
+    {
         printf("转账失败：请先登录！\n");
         return 1;
     }
     // 2. 查找转出账户（当前登录账号）
-    Account* from_acc = find_account(current_login_acc);
-    if (from_acc == NULL) {
+    Account *from_acc = find_account(current_login_acc);
+    if (from_acc == NULL)
+    {
         printf("转账失败：转出账号不存在！\n");
         return 2;
     }
     // 3. 查找转入账户（目标账号）
-    Account* to_acc = find_account(target_acc_id);
-    if (to_acc == NULL) {
+    Account *to_acc = find_account(target_acc_id);
+    if (to_acc == NULL)
+    {
         printf("转账失败：转入账号不存在！\n");
         return 3;
     }
     // 4. 校验转出账户状态
-    if (from_acc->status != ACC_NORMAL) {
+    if (from_acc->status != ACC_NORMAL)
+    {
         printf("转账失败：转出账户状态异常(%s)!\n",
                from_acc->status == ACC_FROZEN ? "冻结" : "挂失");
         return 4;
     }
     // 5. 校验转入账户状态
-    if (to_acc->status != ACC_NORMAL) {
+    if (to_acc->status != ACC_NORMAL)
+    {
         printf("转账失败：转入账户状态异常(%s)!\n",
                to_acc->status == ACC_FROZEN ? "冻结" : "挂失");
         return 5;
     }
     // 6. 校验金额
-    if (!isValidAmount(amount)) {
+    if (!isValidAmount(amount))
+    {
         printf("转账失败:金额必须大于0!\n");
         return 6;
     }
@@ -168,13 +194,15 @@ int transfer(const char* target_acc_id, double amount, const char* trade_pwd) {
     double fee = amount * TRANS_FEE_RATE;
     double total_deduct = amount + fee; // 转出方扣：本金+手续费
     // 8. 校验转出方余额
-    if (from_acc->balance < total_deduct) {
+    if (from_acc->balance < total_deduct)
+    {
         printf("转账失败：余额不足！需扣除本金%.2f + 手续费%.2f = 合计%.2f,当前余额%.2f\n",
                amount, fee, total_deduct, from_acc->balance);
         return 7;
     }
     // 9. 校验交易密码（可选）
-    if (trade_pwd != NULL && !verifyTradePwd(trade_pwd, from_acc->pwd_hash)) {
+    if (trade_pwd != NULL && !verifyTradePwd(trade_pwd, from_acc->pwd_hash))
+    {
         printf("转账失败：交易密码错误！\n");
         return 8;
     }
@@ -192,4 +220,3 @@ int transfer(const char* target_acc_id, double amount, const char* trade_pwd) {
            target_acc_id, amount, to_acc->balance);
     return 0;
 }
-
