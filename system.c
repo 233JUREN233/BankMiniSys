@@ -21,7 +21,7 @@ void freeze_account(const char *acc){
             if (accounts[i].is_frozen)printf("账号 %s 已处于冻结状态! \n",acc);
             else{
             accounts[i].is_frozen = 1;
-            printf("账号 %s 已冻结成功\n",acc);
+            printf("账号 %s 已冻结成功！\n",acc);
             }
             return;
         }    
@@ -35,7 +35,7 @@ void unfreeze_account(const char *acc){
             if (!accounts[i].is_frozen)printf("账号 %s 已处于正常状态! \n",acc);
             else{
             accounts[i].is_frozen = 0;
-            printf("账号 %s 已解冻成功\n",acc);
+            printf("账号 %s 已解冻成功！\n",acc);
             }
             return;
         }    
