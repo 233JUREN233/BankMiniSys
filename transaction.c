@@ -52,7 +52,7 @@ void createTransactionRecord(const char *acc_id, TransType type, double amount, 
            new_trans->time, type_str, amount, new_trans->target_acc);
 }
 
-// 功能1：存款（需登录+账户正常+金额合法+可选密码校验）
+// 一，存款（需登录+账户正常+金额合法+可选密码校验）
 int deposit(double amount, const char *trade_pwd)
 {
     // 1. 校验登录状态
@@ -96,7 +96,7 @@ int deposit(double amount, const char *trade_pwd)
     return 0;
 }
 
-// 功能2：取款（需登录+账户正常+金额合法+余额充足+可选密码校验）
+// 二，取款（需登录+账户正常+金额合法+余额充足+可选密码校验）
 int withdraw(double amount, const char *trade_pwd)
 {
     // 1. 校验登录状态
@@ -147,7 +147,7 @@ int withdraw(double amount, const char *trade_pwd)
     return 0;
 }
 
-// 功能3：转账（需登录+双方账户正常+金额合法+余额充足+可选密码校验）
+// 三，转账（需登录+双方账户正常+金额合法+余额充足+可选密码校验）
 int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
 {
     // 1. 校验登录状态
@@ -206,7 +206,7 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
         printf("转账失败：交易密码错误！\n");
         return 8;
     }
-    // 10. 执行转账（原子操作：要么都成功，要么都失败）
+    // 10. 执行转账（要么都成功，要么都失败）
     from_acc->balance -= total_deduct;
     to_acc->balance += amount;
     // 11. 生成交易记录（双方各一条）
