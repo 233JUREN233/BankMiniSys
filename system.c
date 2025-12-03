@@ -2,7 +2,7 @@
 #include<string.h>
 #include "global.h"
 
-// 定义全局变量
+
 Account accounts[10];//最多有10个账号
 int account_count = 0;//当前帐号数量
 // 1.系统初始化：启动时加载备份数据
@@ -36,7 +36,7 @@ void system_init() {
 }
 
 
-// 数据备份：保存到文件
+// 2.数据备份：保存到文件
 void backup_data() {
     FILE *fp = fopen("bank_backup.txt", "w");
     if (!fp) {
@@ -50,47 +50,4 @@ void backup_data() {
     }
     fclose(fp);
     printf("数据已备份！\n");
-}
-// 2.冻结账号
-void freeze_account(const char *acc){
-    for (int i=0;i<account_count;++i){
-        if(strcmp(accounts[i].acc_id,acc)==0){
-            if (accounts[i].status == ACC_FROZEN)printf("账号 %s 已处于冻结状态! \n",acc);
-            else{
-            accounts[i].status = ACC_FROZEN;
-            printf("账号 %s 已冻结成功！\n",acc);
-            }
-            return;
-        }    
-    }
-    printf("未找到账号 %s! \n",acc);
-}
-// 3.解冻账号
-void unfreeze_account(const char *acc){
-     for (int i=0;i<account_count;++i){
-        if(strcmp(accounts[i].acc_id,acc)==0){
-            if (accounts[i].status != ACC_FROZEN)printf("账号 %s 已处于正常状态! \n",acc);
-            else{
-            accounts[i].status = ACC_NORMAL;
-            printf("账号 %s 已解冻成功！\n",acc);
-            }
-            return;
-        }    
-    }
-    printf("未找到账号 %s! \n",acc);
-}
-// 4.数据备份
-void backup_data() {
-    FILE *fp = fopen("bank_backup.txt", "w");
-    if (!fp) {
-        printf("备份失败：无法打开文件！\n");
-        return;
-    }
-    for (int i = 0; i < account_count; i++) {
-        fprintf(fp, "账号：%s,状态:%s\n", 
-                accounts[i].acc_id, 
-                accounts[i].status == ACC_FROZEN ? "冻结" : "正常");
-    }
-    fclose(fp);
-    printf("数据已备份到 bank_backup.txt!\n");
 }
