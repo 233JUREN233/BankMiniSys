@@ -2,16 +2,17 @@
 #include <stdio.h>
 #include "global.h"
 #include "login.h"
+#include "transaction.h"
 
 
 
-// 辅助函数1：校验金额是否合法（>0，处理浮点数精度）
+// 校验金额是否合法
 static int isValidAmount(double amount)
 {
     return (amount > 0.0001) ? 1 : 0;
 }
 
-// 辅助函数2：获取当前时间（格式：YYYY-MM-DD HH:MM）
+// 获取当前时间
 static void getCurrentTime(char *time_buf, int buf_len)
 {
     time_t now = time(NULL);
@@ -19,16 +20,15 @@ static void getCurrentTime(char *time_buf, int buf_len)
     strftime(time_buf, buf_len, "%Y-%m-%d %H:%M", tm_info);
 }
 
-// 辅助函数3：校验交易密码
+// 校验交易密码
 static int verifyTradePwd(const char *input_pwd, const char *stored_pwd_hash)
 {
-    char input_pwd_hash[33]; // MD5加密后32位字符串
+    char input_pwd_hash[33]; 
     password_md5(input_pwd, input_pwd_hash);
-    // 比对输入密码的哈希值和账户存储的哈希值
     return (strcmp(input_pwd_hash, stored_pwd_hash) == 0) ? 1 : 0;
 }
 
-// 辅助功能：生成交易记录（插入全局链表）
+//生成交易记录
 void createTransactionRecord(const char *acc_id, TransType type, double amount, const char *target_acc)
 {
     Transaction *new_trans = (Transaction *)malloc(sizeof(Transaction));
@@ -37,7 +37,6 @@ void createTransactionRecord(const char *acc_id, TransType type, double amount, 
         printf("交易记录生成失败：内存分配失败！\n");
         return;
     }
-    // 填充记录信息
     strncpy(new_trans->acc_id, acc_id, sizeof(new_trans->acc_id) - 1);
     new_trans->acc_id[sizeof(new_trans->acc_id) - 1] = '\0';
     new_trans->type = type;
@@ -45,10 +44,8 @@ void createTransactionRecord(const char *acc_id, TransType type, double amount, 
     strncpy(new_trans->target_acc, target_acc ? target_acc : "", sizeof(new_trans->target_acc) - 1);
     new_trans->target_acc[sizeof(new_trans->target_acc) - 1] = '\0';
     getCurrentTime(new_trans->time, sizeof(new_trans->time));
-    // 插入全局交易链表头部
     new_trans->next = trans_head;
     trans_head = new_trans;
-    // 打印记录（便于调试）
     const char *type_str = (type == TRANS_DEPOSIT) ? "存款" : (type == TRANS_WITHDRAW) ? "取款"
                                                                                        : "转账";
     printf("交易记录：%s | %s | 金额%.2f | 对方账号：%s\n",
