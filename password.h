@@ -1,18 +1,23 @@
+#include "md5.h"
 
-// 密码加密函数声明
-void simple_hash(const char *input, char *output);
-
-// 密码加密函数实现
-#include <stdio.h>
-void simple_hash(const char *input, char *output)
+// md5加密函数
+void password_md5(const char *input, char *output)
 {
-	unsigned int hash = 5381;
-	int c;
-	while ((c = *input++))
-		hash = ((hash << 5) + hash) + c;
-	sprintf(output, "%08x", hash);
+	MD5_CTX ctx;
+	unsigned char digest[16];
+	MD5Init(&ctx); // 初始化MD5计算上下文
+	MD5Update(&ctx, (unsigned char *)input, strlen(input));
+	MD5Final(&ctx, digest); // 结束MD5计算
+	for (int i = 0; i < 16; i++)
+		sprintf(output + i * 2, "%02x", digest[i]);
+	output[32] = '\0';
 }
 
+// 密码比较函数
+void cmp_password(const char *input, const char *stored_pssword)
+{
+	MD5_CTX ctx;
+	unsigned char digest[16];
+}
 
-//密码加密实现
-
+// 密码加密实现
