@@ -1,4 +1,5 @@
 /*项目地址：https://github.com/talent518/md5*/
+
 #include <string.h>
 #include "md5.h"
 
