@@ -6,7 +6,6 @@
 #include <string.h>
 #include <stdio.h>
 
-Account *find_account(const char *acc_id); // 账户查询函数
 
 // md5加密函数
 void password_md5(const char *input, char *output);
