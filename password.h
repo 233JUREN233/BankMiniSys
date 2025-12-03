@@ -25,5 +25,3 @@ int cmp_password(const char *input, const char *password)
 	else
 		return 0;
 }
-
-// 密码加密实现
