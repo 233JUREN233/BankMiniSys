@@ -1,6 +1,9 @@
+
 #include <stdio.h>
-#include <global.h>
-#include <login.h>
+#include "global.h"
+#include "login.h"
+
+
 
 // 辅助函数1：校验金额是否合法（>0，处理浮点数精度）
 static int isValidAmount(double amount)
