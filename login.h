@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-Account* find_account(const char* acc_id) ;//账户查询函数
+Account *find_account(const char *acc_id); // 账户查询函数
 
 // md5加密函数
 void password_md5(const char *input, char *output)
@@ -40,19 +40,88 @@ int cmp_password(const char *input, const char *password)
 int login(const char *acc_id, const char *pwd)
 {
 	Account *acc = find_account(acc_id);
-	if (acc == 0)
+	if (acc == NULL)
 		return 0; // 账号并不存在
 	if (acc->status == ACC_FROZEN)
 		return 3; // 登录被锁定了
 
-	if(cmp_password(pwd,acc->pwd_hash)){
-		acc->login_fail_count = 0;//登录成功，失败次数清零
+	if (cmp_password(pwd, acc->pwd_hash))
+	{
+		acc->login_fail_count = 0; // 登录成功，失败次数清零
 		return 1;
 	}
-	else{
+	else
+	{
 		acc->login_fail_count++;
-		if(acc->login_fail_count >= MAX_LOGIN_FAIL)
+		if (acc->login_fail_count >= MAX_LOGIN_FAIL)
 			acc->status = ACC_FROZEN;
-		return 2;//密码错误
+		return 2; // 密码错误
 	}
 };
+
+// 挂失
+/*
+返回值：
+0：账号不存在
+1：挂失成功
+2：已挂失
+3：已冻结
+*/
+int lost(const char *acc_id)
+{
+	Account *acc = find_account(acc_id);
+	if (acc == NULL)
+		return 0; // 账号不存在
+	else
+	{
+		if (acc->status == ACC_LOST)
+			return 2; // 已挂失
+		if (acc->status == ACC_FROZEN)
+			return 3; // 已冻结
+		acc->status = ACC_LOST;
+		return 1; // 挂失成功
+	}
+}
+
+// 冻结
+/*
+返回值：
+0：账号不存在
+1：冻结成功
+2：已挂失
+3：已冻结
+*/
+int frezee(const char *acc_id)
+{
+	Account *acc = find_account(acc_id);
+	if (acc == NULL)
+		return 0; // 账号不存在
+	else
+	{
+		if (acc->status == ACC_LOST)
+			return 2; // 已挂失
+		if (acc->status == ACC_FROZEN)
+			return 3; // 已冻结
+		acc->status = ACC_FROZEN;
+		return 1; // 冻结成功
+	}
+}
+
+// 解冻(挂失和冻结共用)
+/*
+返回值：
+0：账号不存在
+1：解冻成功
+2：账户已经是正常状态
+*/
+int unfrezee(const char *acc_id)
+{
+	Account *acc = find_account(acc_id);
+	if (acc == NULL)
+		return 0; // 账号不存在
+	if (acc->status == ACC_NORMAL)
+		return 2; // 账户已经是正常状态
+	acc->status = ACC_NORMAL;
+	acc->login_fail_count = 0;
+	return 1; // 解冻成功
+}
