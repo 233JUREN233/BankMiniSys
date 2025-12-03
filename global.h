@@ -28,7 +28,7 @@ typedef struct
 {
     char acc_id[20];      // 账号（唯一标识）
     char name[30];        // 开户人姓名
-    char pwd_hash[20];    // 密码哈希值（安全模块加密用）
+    char pwd_hash[33];    // 密码哈希值（安全模块加密用）
     double balance;       // 账户余额（交易模块用）
     AccountStatus status; // 账户状态（安全/系统模块用）
     int login_fail_count; // 登录失败次数
