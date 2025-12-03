@@ -43,3 +43,17 @@ void unfreeze_account(const char *acc){
     printf("未找到账号 %s! \n",acc);
 }
 // 4.数据备份
+void backup_data() {
+    FILE *fp = fopen("bank_backup.txt", "w");
+    if (!fp) {
+        printf("备份失败：无法打开文件！\n");
+        return;
+    }
+    for (int i = 0; i < account_count; i++) {
+        fprintf(fp, "账号：%s,状态:%s\n", 
+                accounts[i].account, 
+                accounts[i].is_frozen ? "冻结" : "正常");
+    }
+    fclose(fp);
+    printf("数据已备份到 bank_backup.txt!\n");
+}
