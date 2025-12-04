@@ -1,5 +1,9 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <math.h>
 #include "global.h"
 #include "login.h"
 #include "md5.h"
@@ -56,7 +60,7 @@ int main()
         printf("欢迎登陆，用户%s", id);
     }
 
-    // 管理员身份
+    // 管理员身份登录
     else if (situation == 2)
     {
     }
