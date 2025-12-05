@@ -1,7 +1,9 @@
 #include "account.h"
+#include <string.h>
+#include <math.h>
 
 // 计算哈希值
-static int hash_acc_id(const char *acc_id)
+int hash_acc_id(const char *acc_id)
 {
     unsigned int hash = 0;
 
@@ -54,13 +56,17 @@ int remove_account(const char *acc_id)
             else
                 acc_hash[idx] = curr->next;
             free(curr);
-            return 1;
+            return 0;
         }
         prev = curr;
         curr = curr->next;
     }
+<<<<<<< HEAD
 
     return 0;
+=======
+    return 1;
+>>>>>>> d00f09e5808c8a2cf391f6382851dcbb6b48e564
 }
 
 // 释放全部账户链表

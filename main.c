@@ -11,7 +11,11 @@
 
 // 主程序
 int main()
+
 {
+    // initialization
+    srand((unsigned int)time(NULL));
+
     // part1 选择登录身份
     printf("欢迎登录BankMiniSys!\n");
     printf("请选择你的身份:\n");
