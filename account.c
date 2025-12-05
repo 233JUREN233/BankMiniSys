@@ -61,12 +61,8 @@ int remove_account(const char *acc_id)
         prev = curr;
         curr = curr->next;
     }
-<<<<<<< HEAD
 
     return 0;
-=======
-    return 1;
->>>>>>> d00f09e5808c8a2cf391f6382851dcbb6b48e564
 }
 
 // 释放全部账户链表
