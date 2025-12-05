@@ -80,9 +80,9 @@ int make_account(char *acc_id, int num)
 {
     sprintf(acc_id, "%s%04d", ACCOUNT_PREFIX, num);
     if (find_account(acc_id) == NULL)
-        return 0; // 成功返回0
+        return 0;
     else
-        return 1; // 失败返回1
+        return 1;
 }
 
 // 查找账号的流程如下：
