@@ -24,7 +24,7 @@ typedef enum
 #define ACCOUNT_PREFIX "6222"         // 账号前缀（生成唯一账号用）
 
 // 账户结构体（账户管理/安全/交易模块共用）
-typedef struct
+typedef struct Account
 {
     char acc_id[20];      // 账号（唯一标识）
     char name[30];        // 开户人姓名
@@ -32,6 +32,7 @@ typedef struct
     double balance;       // 账户余额（交易模块用）
     AccountStatus status; // 账户状态（安全/系统模块用）
     int login_fail_count; // 登录失败次数
+    struct Account *next; // 哈希链表
 } Account;
 
 // 交易记录结构体（交易/账单模块共用）
@@ -48,5 +49,3 @@ typedef struct Transaction
 Account *acc_hash[HASH_SIZE];   // 账户哈希表（账户管理模块核心存储）
 Transaction *trans_head = NULL; // 交易记录链表头（账单模块核心存储）
 char current_login_acc[20];     // 当前登录账号（空字符串=未登录，全模块共用）
-
-Account *find_account(const char *acc_id); // 账户查询函数

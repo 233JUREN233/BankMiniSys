@@ -3,9 +3,9 @@
 
 #include "md5.h"
 #include "global.h"
+#include "account.h"
 #include <string.h>
 #include <stdio.h>
-
 
 // md5加密函数
 void password_md5(const char *input, char *output);
