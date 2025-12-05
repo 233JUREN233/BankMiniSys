@@ -4,10 +4,12 @@
 static int hash_acc_id(const char *acc_id)
 {
     unsigned int hash = 0;
+
     for (int i = 0; acc_id[i] != '\0'; i++)
     {
         hash = hash * 131 + (unsigned char)acc_id[i];
     }
+
     return hash % HASH_SIZE;
 }
 
@@ -24,6 +26,7 @@ Account *find_account(const char *acc_id)
 {
     int idx = hash_acc_id(acc_id);
     Account *curr = acc_hash[idx];
+
     while (curr)
     {
         if (strcmp(curr->acc_id, acc_id) == 0)
@@ -32,6 +35,7 @@ Account *find_account(const char *acc_id)
         }
         curr = curr->next;
     }
+
     return NULL;
 }
 
@@ -40,6 +44,7 @@ int remove_account(const char *acc_id)
 {
     int idx = hash_acc_id(acc_id);
     Account *curr = acc_hash[idx], *prev = NULL;
+
     while (curr)
     {
         if (strcmp(curr->acc_id, acc_id) == 0)
@@ -54,6 +59,7 @@ int remove_account(const char *acc_id)
         prev = curr;
         curr = curr->next;
     }
+
     return 0;
 }
 
@@ -71,4 +77,24 @@ void free_all_accounts(void)
         }
         acc_hash[i] = NULL;
     }
+}
+
+//生成id
+void generate_account_id(char *acc_id, size_t size)
+{
+    static int counter = 10001;
+
+    if(size >= 20)
+    {
+        sprintf(acc_id,"%s%08d",ACCOUNT_PREFIX,counter);
+        counter++;
+    }
+
+
+}
+
+//开户
+int create_account(const char *name, const char *password, double initial_balance, char *generated_id)
+{
+
 }
