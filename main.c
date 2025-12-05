@@ -58,6 +58,7 @@ int main()
         Sleep(500);
         putchar('\n');
         printf("欢迎登陆，用户%s", id);
+        
     }
 
     // 管理员身份登录

@@ -1,4 +1,5 @@
 #include "account.h"
+#include <string.h>
 
 // 计算哈希值
 static int hash_acc_id(const char *acc_id)
@@ -72,3 +73,5 @@ void free_all_accounts(void)
         acc_hash[i] = NULL;
     }
 }
+
+

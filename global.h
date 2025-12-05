@@ -32,7 +32,7 @@ typedef struct Account
     double balance;       // 账户余额（交易模块用）
     AccountStatus status; // 账户状态（安全/系统模块用）
     int login_fail_count; // 登录失败次数
-    struct Account *next; // 哈希链表
+    struct Account *next; // 链表节点
 } Account;
 
 // 交易记录结构体（交易/账单模块共用）
