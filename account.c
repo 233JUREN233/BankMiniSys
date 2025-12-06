@@ -56,12 +56,12 @@ int remove_account(const char *acc_id)
             else
                 acc_hash[idx] = curr->next;
             free(curr);
-            return 0;
+            return 0; // 成功返回0
         }
         prev = curr;
         curr = curr->next;
     }
-    return 1;
+    return 1; // 失败返回1
 }
 
 // 释放全部账户链表
