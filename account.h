@@ -20,7 +20,17 @@ int remove_account(const char *acc_id);
 // 释放全部账户链表（程序退出时调用，防止leak）
 void free_all_accounts(void);
 
-// 生成随机唯一账号（返回 1：失败 0：成功）
-int make_account(char *acc_id, int num);
+//开户
+int create_account(const char *name, const char *password, double initial_balance, char *generated_id);
+
+//生成id
+void generate_account_id(char *acc_id, size_t size);
+
+//销户
+int close_account(const char *acc_id);
+
+//查询余额
+double get_balance(const char *acc_id);
+
 
 #endif
