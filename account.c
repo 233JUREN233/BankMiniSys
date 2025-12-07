@@ -56,13 +56,12 @@ int remove_account(const char *acc_id)
             else
                 acc_hash[idx] = curr->next;
             free(curr);
-            return 0;
+            return 0; // 成功返回0
         }
         prev = curr;
         curr = curr->next;
     }
-
-    return 0;
+    return 1; // 失败返回1
 }
 
 // 释放全部账户链表
@@ -81,14 +80,14 @@ void free_all_accounts(void)
     }
 }
 
-//生成id
+// 生成id
 void generate_account_id(char *acc_id, size_t size)
 {
     static int counter = 10001;
 
-    if(size >= 20)
+    if (size >= 20)
     {
-        sprintf(acc_id,"%s%08d",ACCOUNT_PREFIX,counter);
+        sprintf(acc_id, "%s%08d", ACCOUNT_PREFIX, counter);
         counter++;
     }
 
