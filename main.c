@@ -247,7 +247,6 @@ int main()
         return 1;
     }
 
-    // 程序结束前保存账户和交易记录
-    save_accounts();
-    save_transactions_to_file();
+    // 保存账户和交易记录
+    system_save();
 }

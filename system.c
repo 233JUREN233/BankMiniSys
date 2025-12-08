@@ -9,7 +9,6 @@
 // 系统初始化：清空内存状态并加载账户、交易记录
 void system_init()
 {
-    // 清空全局内存状态
     for (int i = 0; i < HASH_SIZE; i++)
     {
         acc_hash[i] = NULL;
@@ -22,7 +21,14 @@ void system_init()
     load_transactions_from_file();
 }
 
-// 数据备份：保存账户与交易记录到文件
+// 系统保存
+void system_save()
+{
+    save_accounts;
+    save_transactions_to_file;
+}
+
+// 数据备份
 void backup_data()
 {
 }
