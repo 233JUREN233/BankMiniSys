@@ -16,11 +16,7 @@ int main()
 {
     // part0 initialization
     srand((unsigned int)time(NULL));
-    load_accounts();
-    load_transactions_from_file();
-
-    // 加载历史交易记录到内存（如果存在）
-    load_transactions_from_file();
+    system_init();
 
     // part1 选择登录身份
     printf("欢迎登录BankMiniSys!\n");
