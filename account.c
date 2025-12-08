@@ -151,3 +151,9 @@ int create_account(const char *name, const char *password, double initial_balanc
 int close_account(const char *acc_id)
 {
 }
+
+// 启动时加载账户
+int load_accounts(void);
+
+// 保存所有账户到文件（全量重写）
+int save_accounts(void);
