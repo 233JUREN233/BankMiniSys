@@ -3,6 +3,7 @@
 #include "global.h"
 #include "login.h"
 #include "transaction.h"
+#include "bill.h"
 #include <string.h> 
 #include <stdlib.h> 
 #include <time.h>
@@ -53,6 +54,9 @@ void createTransactionRecord(const char *acc_id, TransType type, double amount, 
                                                                                        : "转账";
     printf("交易记录：%s | %s | 金额%.2f | 对方账号：%s\n",
            new_trans->time, type_str, amount, new_trans->target_acc);
+
+    // 持久化：保存当前内存链表到文件（覆盖写入，保证重启不丢失）
+    save_transactions_to_file();
 }
 
 // 一，存款（需登录+账户正常+金额合法+可选密码校验）

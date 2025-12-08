@@ -8,6 +8,7 @@
 #include "login.h"
 #include "md5.h"
 #include "render.h"
+#include "bill.h"
 
 // 主程序
 int main()
@@ -15,6 +16,9 @@ int main()
 {
     // initialization
     srand((unsigned int)time(NULL));
+
+    // 加载历史交易记录到内存（如果存在）
+    load_transactions_from_file();
 
     // part1 选择登录身份
     printf("欢迎登录BankMiniSys!\n");
