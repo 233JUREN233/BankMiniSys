@@ -13,6 +13,51 @@
 #include "account.h"
 #include "system.h"
 
+// 清空输入缓冲，防止脏输入残留
+static void clear_input_buffer(void)
+{
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF)
+    {
+    }
+}
+
+// 安全读取整数，遇到非数字会提示并重试
+static int read_int(const char *prompt)
+{
+    int val;
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (scanf("%d", &val) == 1)
+        {
+            clear_input_buffer();
+            return val;
+        }
+        printf("输入无效，请输入数字。\n");
+        clear_input_buffer();
+    }
+}
+
+// 安全读取浮点数，遇到非法输入会提示并重试
+static double read_double(const char *prompt)
+{
+    double val;
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (scanf("%lf", &val) == 1)
+        {
+            clear_input_buffer();
+            return val;
+        }
+        printf("输入无效，请输入数字。\n");
+        clear_input_buffer();
+    }
+}
+
 // 主程序
 int main()
 
@@ -25,8 +70,7 @@ int main()
     printf("欢迎登录BankMiniSys!\n");
     printf("请选择你的身份:\n");
     printf("1.用户 2.管理员\n");
-    int situation;
-    scanf("%d", &situation);
+    int situation = read_int("请选择：");
 
     // 用户身份登录
     if (situation == 1)
@@ -79,8 +123,7 @@ int main()
             printf("6. 挂失\n");
             printf("7. 解冻/解挂\n");
             printf("0. 退出\n");
-            int choice;
-            scanf("%d", &choice);
+            int choice = read_int("请选择：");
 
             if (choice == 0)
             {
@@ -99,28 +142,22 @@ int main()
             }
             else if (choice == 2)
             {
-                double amt;
-                printf("请输入存款金额：");
-                scanf("%lf", &amt);
+                double amt = read_double("请输入存款金额：");
                 if (deposit(amt, NULL) == 0)
                     save_accounts();
             }
             else if (choice == 3)
             {
-                double amt;
-                printf("请输入取款金额：");
-                scanf("%lf", &amt);
+                double amt = read_double("请输入取款金额：");
                 if (withdraw(amt, NULL) == 0)
                     save_accounts();
             }
             else if (choice == 4)
             {
                 char target[20];
-                double amt;
                 printf("转入账号：");
                 scanf("%s", target);
-                printf("金额：");
-                scanf("%lf", &amt);
+                double amt = read_double("金额：");
                 if (transfer(target, amt, NULL) == 0)
                     save_accounts();
             }
@@ -192,20 +229,17 @@ int main()
             printf("4. 挂失账户\n");
             printf("5. 备份数据\n");
             printf("0. 退出\n");
-            int choice;
-            scanf("%d", &choice);
+            int choice = read_int("请选择：");
             if (choice == 0)
                 break;
             if (choice == 1)
             {
                 char name[30], pwd[40], new_id[20];
-                double init;
                 printf("姓名：");
                 scanf("%s", name);
                 printf("密码：");
                 scanf("%s", pwd);
-                printf("初始余额：");
-                scanf("%lf", &init);
+                double init = read_double("初始余额：");
                 if (create_account(name, pwd, init, new_id))
                 {
                     printf("开户成功，账号：%s\n", new_id);
