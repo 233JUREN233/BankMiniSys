@@ -55,6 +55,9 @@ int main()
             if (login_result == 1)
             {
                 printf("登陆成功！\n");
+                // 将已登录账号保存到全局变量，以便交易模块等使用
+                strncpy(current_login_acc, id, sizeof(current_login_acc) - 1);
+                current_login_acc[sizeof(current_login_acc) - 1] = '\0';
                 break;
             }
         }
