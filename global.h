@@ -1,3 +1,6 @@
+#ifndef GLOBAL_H
+#define GLOBAL_H
+
 #include <stdlib.h>
 
 // 账户状态（安全模块/账户管理模块用）
@@ -49,3 +52,5 @@ typedef struct Transaction
 extern Account *acc_hash[HASH_SIZE]; // 账户哈希表（账户管理模块核心存储）
 extern Transaction *trans_head;      // 交易记录链表头（账单模块核心存储）
 extern char current_login_acc[20];   // 当前登录账号（空字符串=未登录，全模块共用）
+
+#endif // GLOBAL_H
