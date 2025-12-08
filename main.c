@@ -8,6 +8,7 @@
 #include "login.h"
 #include "md5.h"
 #include "render.h"
+#include "bill.h"
 
 // 主程序
 int main()
@@ -15,6 +16,9 @@ int main()
 {
     // part0 initialization
     srand((unsigned int)time(NULL));
+
+    // 加载历史交易记录到内存（如果存在）
+    load_transactions_from_file();
 
     // part1 选择登录身份
     printf("欢迎登录BankMiniSys!\n");
@@ -55,6 +59,9 @@ int main()
             if (login_result == 1)
             {
                 printf("登陆成功！\n");
+                // 将已登录账号保存到全局变量，以便交易模块等使用
+                strncpy(current_login_acc, id, sizeof(current_login_acc) - 1);
+                current_login_acc[sizeof(current_login_acc) - 1] = '\0';
                 break;
             }
         }
