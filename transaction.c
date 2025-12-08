@@ -56,7 +56,7 @@ int deposit(double amount, const char *trade_pwd)
         printf("存款失败：请先登录！\n");
         return 1;
     }
-    // 调用find_account查找账户
+    // 查找账户
     Account *curr_acc = find_account(current_login_acc);
     if (curr_acc == NULL)
     {
@@ -76,7 +76,7 @@ int deposit(double amount, const char *trade_pwd)
         printf("存款失败:金额必须大于0!\n");
         return 4;
     }
-    // 校验交易密码（可选，若团队要求交易需二次验证）
+    // 校验交易密码
     if (trade_pwd != NULL && !cmp_password(trade_pwd, curr_acc->pwd_hash))
     {
         printf("存款失败：交易密码错误！\n");
@@ -151,14 +151,14 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
         printf("转账失败：请先登录！\n");
         return 1;
     }
-    // 查找转出账户（当前登录账号）
+    // 查找转出账户
     Account *from_acc = find_account(current_login_acc);
     if (from_acc == NULL)
     {
         printf("转账失败：转出账号不存在！\n");
         return 2;
     }
-    // 查找转入账户（目标账号）
+    // 查找转入账户
     Account *to_acc = find_account(target_acc_id);
     if (to_acc == NULL)
     {
@@ -187,7 +187,7 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
     }
     // 计算手续费和总扣款金额
     double fee = amount * TRANS_FEE_RATE;
-    double total_deduct = amount + fee; // 转出方扣：本金+手续费
+    double total_deduct = amount + fee;
     // 校验转出方余额
     if (from_acc->balance < total_deduct)
     {
@@ -205,8 +205,8 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
     from_acc->balance -= total_deduct;
     to_acc->balance += amount;
     // 生成交易记录
-    createTransactionRecord(current_login_acc, TRANS_TRANSFER, amount, target_acc_id); // 转出记录
-    createTransactionRecord(target_acc_id, TRANS_TRANSFER, amount, current_login_acc); // 转入记录
+    createTransactionRecord(current_login_acc, TRANS_TRANSFER, amount, target_acc_id);
+    createTransactionRecord(target_acc_id, TRANS_TRANSFER, amount, current_login_acc);
     // 输出结果
     printf("转账成功！\n");
     printf("转出账号：%s | 扣除本金%.2f + 手续费%.2f | 当前余额：%.2f\n",
