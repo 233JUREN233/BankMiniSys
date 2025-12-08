@@ -1,6 +1,7 @@
-#include "account.h"
 #include <string.h>
 #include <math.h>
+#include "login.h"
+#include "account.h"
 
 // 计算哈希值
 int hash_acc_id(const char *acc_id)
