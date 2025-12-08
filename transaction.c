@@ -44,7 +44,6 @@ void createTransactionRecord(const char *acc_id, TransType type, double amount, 
     printf("交易记录：%s | %s | 金额%.2f | 对方账号：%s\n",
            new_trans->time, type_str, amount, new_trans->target_acc);
 
-    // 持久化：保存当前内存链表到文件（覆盖写入，保证重启不丢失）
     save_transactions_to_file();
 }
 
