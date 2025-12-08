@@ -96,3 +96,4 @@ void generate_account_id(char *acc_id, size_t size)
 int create_account(const char *name, const char *password, double initial_balance, char *generated_id)
 {
 }
+ 
