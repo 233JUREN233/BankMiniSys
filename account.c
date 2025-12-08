@@ -99,10 +99,21 @@ int create_account(const char *name, const char *password, double initial_balanc
     {
         return 0;
     }
+
     char new_id[20];
     generate_account_id(new_id, sizeof(new_id));
 
+    if (find_account(new_id) != NULL)
+    {
+        return 0;
+    }
+
     Account *new_acc = malloc(sizeof(Account));
+    if (!new_acc)
+    {
+        return 0;
+    }
+
     strcpy(new_acc->acc_id, new_id);
     strcpy(new_acc->name, name);
     password_md5(password, new_acc->pwd_hash);
@@ -112,16 +123,23 @@ int create_account(const char *name, const char *password, double initial_balanc
     new_acc->login_fail_count = 0;
     new_acc->next = NULL;
 
-    void insert_account(new_acc);
-
     FILE *fp = fopen(ACCOUNT_FILE, "ab");
-    if (fp)
+    if (!fp)
     {
-        fwrite(new_acc, sizeof(Account), 1, fp);
-        fclose(fp);
+        free(new_acc);
+        return 0;
     }
+    if (fwrite(new_acc, sizeof(Account), 1, fp) != 1)
+    {
+        fclose(fp);
+        free(new_acc);
+        return 0;
+    }
+    fclose(fp);
 
-    if (new_id)
+    insert_account(new_acc);
+
+    if (generated_id)
     {
         strcpy(generated_id, new_id);
     }
