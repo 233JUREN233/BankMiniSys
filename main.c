@@ -13,7 +13,7 @@
 int main()
 
 {
-    // initialization
+    // part0 initialization
     srand((unsigned int)time(NULL));
 
     // part1 选择登录身份

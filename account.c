@@ -90,14 +90,14 @@ void generate_account_id(char *acc_id, size_t size)
         sprintf(acc_id, "%s%08d", ACCOUNT_PREFIX, counter);
         counter++;
     }
-
 }
 
-//开户(返回0失败，返回1成功)
+// 开户(返回0失败，返回1成功)
 int create_account(const char *name, const char *password, double initial_balance, char *generated_id)
 {
-    if (!name || !password || initial_balance < 0) {
-        return 0; 
+    if (!name || !password || initial_balance < 0)
+    {
+        return 0;
     }
     char new_id[20];
     generate_account_id(new_id, sizeof(new_id));
@@ -110,26 +110,26 @@ int create_account(const char *name, const char *password, double initial_balanc
     new_acc->balance = initial_balance;
     new_acc->status = ACC_NORMAL;
     new_acc->login_fail_count = 0;
-    new_acc->next = NULL; 
+    new_acc->next = NULL;
 
     void insert_account(new_acc);
-    
-    FILE *fp = fopen(ACCOUNT_FILE, "ab");  
-    if (fp) {
+
+    FILE *fp = fopen(ACCOUNT_FILE, "ab");
+    if (fp)
+    {
         fwrite(new_acc, sizeof(Account), 1, fp);
         fclose(fp);
     }
 
-    if(new_id){
-        strcpy(generated_id,new_id);
+    if (new_id)
+    {
+        strcpy(generated_id, new_id);
     }
 
     return 1;
 }
 
-//销户
+// 销户
 int close_account(const char *acc_id)
 {
-    
 }
- 
