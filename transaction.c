@@ -3,6 +3,7 @@
 #include "login.h"
 #include "transaction.h"
 #include "bill.h"
+#include "account.h"
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -86,6 +87,7 @@ int deposit(double amount, const char *trade_pwd)
     curr_acc->balance += amount;
     // 生成交易记录
     createTransactionRecord(current_login_acc, TRANS_DEPOSIT, amount, "");
+    save_accounts();
     // 输出结果
     printf("存款成功！当前余额：%.2f\n", curr_acc->balance);
     return 0;
@@ -137,6 +139,7 @@ int withdraw(double amount, const char *trade_pwd)
     curr_acc->balance -= amount;
     // 生成交易记录
     createTransactionRecord(current_login_acc, TRANS_WITHDRAW, amount, "");
+    save_accounts();
     // 输出结果
     printf("取款成功！当前余额：%.2f\n", curr_acc->balance);
     return 0;
@@ -207,6 +210,7 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
     // 生成交易记录
     createTransactionRecord(current_login_acc, TRANS_TRANSFER, amount, target_acc_id);
     createTransactionRecord(target_acc_id, TRANS_TRANSFER, amount, current_login_acc);
+    save_accounts();
     // 输出结果
     printf("转账成功！\n");
     printf("转出账号：%s | 扣除本金%.2f + 手续费%.2f | 当前余额：%.2f\n",

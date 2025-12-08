@@ -4,7 +4,7 @@
 #include "login.h"
 #include "account.h"
 
-// 账号递增计数器，启动时会根据已有账号更新
+// 账号递增计数器
 static int g_account_counter = 10001;
 
 // 计算哈希值
@@ -159,61 +159,9 @@ int close_account(const char *acc_id)
 // 启动时加载账户
 int load_accounts(void)
 {
-    FILE *fp = fopen(ACCOUNT_FILE, "rb");
-    if (!fp)
-    {
-        // 文件不存在视为无账户，不算错误
-        return 1;
-    }
-
-    Account temp;
-    while (fread(&temp, sizeof(Account), 1, fp) == 1)
-    {
-        Account *acc = malloc(sizeof(Account));
-        if (!acc)
-        {
-            fclose(fp);
-            return 0;
-        }
-        memcpy(acc, &temp, sizeof(Account));
-        acc->next = NULL;
-        insert_account(acc);
-
-        // 维护递增计数器，避免重启后重复账号
-        if (strncmp(acc->acc_id, ACCOUNT_PREFIX, strlen(ACCOUNT_PREFIX)) == 0)
-        {
-            const char *suffix = acc->acc_id + strlen(ACCOUNT_PREFIX);
-            int num = atoi(suffix);
-            if (num >= g_account_counter)
-            {
-                g_account_counter = num + 1;
-            }
-        }
-    }
-
-    fclose(fp);
-    return 1;
 }
 
 // 保存所有账户到文件
 int save_accounts(void)
 {
-    FILE *fp = fopen(ACCOUNT_FILE, "wb");
-    if (!fp)
-    {
-        return 0;
-    }
-
-    for (int i = 0; i < HASH_SIZE; i++)
-    {
-        Account *curr = acc_hash[i];
-        while (curr)
-        {
-            fwrite(curr, sizeof(Account), 1, fp);
-            curr = curr->next;
-        }
-    }
-
-    fclose(fp);
-    return 1;
 }

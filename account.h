@@ -29,9 +29,6 @@ void generate_account_id(char *acc_id, size_t size);
 // 销户
 int close_account(const char *acc_id);
 
-// 查询余额
-double get_balance(const char *acc_id);
-
 // 启动时加载账户
 int load_accounts(void);
 
