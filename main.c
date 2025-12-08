@@ -157,7 +157,7 @@ int main()
     // 管理员身份
     else if (situation == 2)
     {
-        // 简单的管理员认证（固定账号/密码，三次机会）
+        // 管理员认证
         const char *ADMIN_USER = "admin";
         const char *ADMIN_PWD = "admin123";
         char admin_user[32];
@@ -182,7 +182,7 @@ int main()
             return 0;
         }
 
-        // 简单管理员菜单（未做管理员认证）
+        // 管理员菜单
         while (1)
         {
             printf("\n管理员菜单：\n");
