@@ -1,4 +1,5 @@
 #include "render.h"
+#include "account.h"
 
 void get_password(char *pwd, int maxlen)
 {
@@ -9,7 +10,7 @@ void get_password(char *pwd, int maxlen)
         ch = _getch(); // 输入但不显示
         if (ch == '\r' || ch == '\n')
         {
-            // 回车结束
+            // 回车结束qq
             break;
         }
         else if (ch == '\b' && i > 0)

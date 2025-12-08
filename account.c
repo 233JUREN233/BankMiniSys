@@ -299,7 +299,6 @@ int save_accounts(void)
 
     fclose(fp);
 
-    // 也持久化计数器，防止倒退
     save_counter_to_file(g_account_counter);
 
     return 1;
