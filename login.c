@@ -1,4 +1,5 @@
 #include "login.h"
+#include "account.h"
 
 // md5加密函数
 void password_md5(const char *input, char *output)
@@ -31,11 +32,15 @@ int login(const char *acc_id, const char *pwd)
     if (acc == NULL)
         return 0; // 账号并不存在
     if (acc->status == ACC_FROZEN)
-        return 3; // 登录被锁定了
+    {
+        save_accounts();
+        return 3;
+    } // 登录被锁定了
 
     if (cmp_password(pwd, acc->pwd_hash))
     {
         acc->login_fail_count = 0; // 登录成功，失败次数清零
+        save_accounts();
         return 1;
     }
     else
@@ -43,6 +48,7 @@ int login(const char *acc_id, const char *pwd)
         acc->login_fail_count++;
         if (acc->login_fail_count >= MAX_LOGIN_FAIL)
             acc->status = ACC_FROZEN;
+        save_accounts();
         return 2; // 密码错误
     }
 }
@@ -60,6 +66,7 @@ int lost(const char *acc_id)
         if (acc->status == ACC_FROZEN)
             return 3; // 已冻结
         acc->status = ACC_LOST;
+        save_accounts();
         return 1; // 挂失成功
     }
 }
@@ -77,6 +84,7 @@ int freeze(const char *acc_id)
         if (acc->status == ACC_FROZEN)
             return 3; // 已冻结
         acc->status = ACC_FROZEN;
+        save_accounts();
         return 1; // 冻结成功
     }
 }
@@ -91,5 +99,6 @@ int unfreeze(const char *acc_id)
         return 2; // 账户已经是正常状态
     acc->status = ACC_NORMAL;
     acc->login_fail_count = 0;
+    save_accounts();
     return 1; // 解冻成功
 }
