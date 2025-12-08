@@ -3,6 +3,9 @@
 #include "global.h"
 #include "login.h"
 #include "transaction.h"
+#include <string.h> 
+#include <stdlib.h> 
+#include <time.h>
 
 
 
