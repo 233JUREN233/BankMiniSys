@@ -128,7 +128,6 @@ int main()
             if (choice == 0)
             {
                 current_login_acc[0] = '\0';
-                save_accounts();
                 break;
             }
 
@@ -143,14 +142,12 @@ int main()
             else if (choice == 2)
             {
                 double amt = read_double("请输入存款金额：");
-                if (deposit(amt, NULL) == 0)
-                    save_accounts();
+                deposit(amt, NULL);
             }
             else if (choice == 3)
             {
                 double amt = read_double("请输入取款金额：");
-                if (withdraw(amt, NULL) == 0)
-                    save_accounts();
+                withdraw(amt, NULL);
             }
             else if (choice == 4)
             {
@@ -158,8 +155,7 @@ int main()
                 printf("转入账号：");
                 scanf("%s", target);
                 double amt = read_double("金额：");
-                if (transfer(target, amt, NULL) == 0)
-                    save_accounts();
+                transfer(target, amt, NULL);
             }
             else if (choice == 5)
             {
@@ -170,7 +166,6 @@ int main()
                 if (lost(current_login_acc) == 1)
                 {
                     printf("挂失成功\n");
-                    save_accounts();
                 }
                 else
                     printf("挂失失败或状态异常\n");
@@ -180,7 +175,6 @@ int main()
                 if (unfreeze(current_login_acc) == 1)
                 {
                     printf("已解冻/解挂\n");
-                    save_accounts();
                 }
                 else
                     printf("解冻失败或已是正常状态\n");
@@ -243,7 +237,6 @@ int main()
                 if (create_account(name, pwd, init, new_id))
                 {
                     printf("开户成功，账号：%s\n", new_id);
-                    save_accounts();
                 }
                 else
                 {
@@ -258,7 +251,6 @@ int main()
                 if (freeze(acc) == 1)
                 {
                     printf("冻结成功\n");
-                    save_accounts();
                 }
                 else
                     printf("冻结失败或状态异常\n");
@@ -271,7 +263,6 @@ int main()
                 if (unfreeze(acc) == 1)
                 {
                     printf("解冻成功\n");
-                    save_accounts();
                 }
                 else
                     printf("解冻失败或状态异常\n");
@@ -284,7 +275,6 @@ int main()
                 if (lost(acc) == 1)
                 {
                     printf("挂失成功\n");
-                    save_accounts();
                 }
                 else
                     printf("挂失失败或状态异常\n");
@@ -308,4 +298,8 @@ int main()
 
     // 保存账户和交易记录
     system_save();
+
+    // 释放内存
+    free_all_transactions();
+    free_all_accounts();
 }
