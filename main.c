@@ -157,6 +157,31 @@ int main()
     // 管理员身份
     else if (situation == 2)
     {
+        // 简单的管理员认证（固定账号/密码，三次机会）
+        const char *ADMIN_USER = "admin";
+        const char *ADMIN_PWD = "admin123";
+        char admin_user[32];
+        char admin_pwd[64];
+        int authed = 0;
+        for (int attempt = 1; attempt <= 3; attempt++)
+        {
+            printf("请输入管理员账号：");
+            scanf("%31s", admin_user);
+            printf("请输入管理员密码：\n");
+            get_password(admin_pwd, sizeof(admin_pwd));
+            if (strcmp(admin_user, ADMIN_USER) == 0 && strcmp(admin_pwd, ADMIN_PWD) == 0)
+            {
+                authed = 1;
+                break;
+            }
+            printf("账号或密码错误，剩余尝试次数：%d\n", 3 - attempt);
+        }
+        if (!authed)
+        {
+            printf("管理员认证失败，程序结束。\n");
+            return 0;
+        }
+
         // 简单管理员菜单（未做管理员认证）
         while (1)
         {

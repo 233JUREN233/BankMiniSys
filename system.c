@@ -21,7 +21,7 @@ void system_init()
     load_transactions_from_file();
 }
 
-// 系统保存
+// 保存数据
 void system_save()
 {
     save_accounts();
@@ -31,4 +31,7 @@ void system_save()
 // 数据备份
 void backup_data()
 {
+    save_accounts();
+    save_transactions_to_file();
+    printf("备份完成：账户与交易记录已写入文件\n");
 }
