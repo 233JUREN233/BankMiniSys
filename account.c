@@ -112,7 +112,7 @@ int create_account(const char *name, const char *password, double initial_balanc
     new_acc->login_fail_count = 0;
     new_acc->next = NULL; 
 
-    void insert_account(new_acc);
+    insert_account(new_acc);
     
     FILE *fp = fopen(ACCOUNT_FILE, "ab");  
     if (fp) {
