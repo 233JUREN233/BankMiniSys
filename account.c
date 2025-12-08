@@ -1,11 +1,23 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "login.h"
 #include "account.h"
 
 // 账号递增计数器
 static int g_account_counter = 10001;
+
+typedef struct DiskAccount
+{
+    char acc_id[20];
+    char name[30];
+    char pwd_hash[33];
+    double balance;
+    AccountStatus status;
+    int login_fail_count;
+static int g_account_counter = 10001;
+static const char *ACCOUNT_COUNTER_FILE = "account_counter.dat";
 
 // 计算哈希值
 int hash_acc_id(const char *acc_id)
@@ -17,6 +29,28 @@ int hash_acc_id(const char *acc_id)
         hash = hash * 131 + (unsigned char)acc_id[i];
     }
 
+// 从文件加载计数器；若不存在返回 -1
+static int load_counter_from_file(void)
+{
+    FILE *fp = fopen(ACCOUNT_COUNTER_FILE, "rb");
+    if (!fp)
+        return -1;
+    int val = -1;
+    if (fread(&val, sizeof(int), 1, fp) != 1)
+        val = -1;
+    fclose(fp);
+    return val;
+}
+
+// 将计数器写入文件
+static void save_counter_to_file(int counter)
+{
+    FILE *fp = fopen(ACCOUNT_COUNTER_FILE, "wb");
+    if (!fp)
+        return;
+    fwrite(&counter, sizeof(int), 1, fp);
+    fclose(fp);
+}
     return hash % HASH_SIZE;
 }
 
@@ -101,6 +135,12 @@ int create_account(const char *name, const char *password, double initial_balanc
     if (!name || !password || initial_balance < 0)
     {
         return 0;
+        // 没有账户文件也尝试加载计数器
+        int persisted = load_counter_from_file();
+        if (persisted > 0)
+        {
+            g_account_counter = persisted;
+        }
     }
 
     char new_id[20];
@@ -109,6 +149,17 @@ int create_account(const char *name, const char *password, double initial_balanc
     if (find_account(new_id) != NULL)
     {
         return 0;
+    }
+    // 读取持久化计数器，取更大值防倒退
+    int persisted = load_counter_from_file();
+    if (persisted > g_account_counter)
+    {
+        g_account_counter = persisted;
+    }
+    else
+    {
+        // 更新持久化文件，保证计数与现有账号最大值一致
+        save_counter_to_file(g_account_counter);
     }
 
     Account *new_acc = malloc(sizeof(Account));
@@ -126,13 +177,22 @@ int create_account(const char *name, const char *password, double initial_balanc
     new_acc->login_fail_count = 0;
     new_acc->next = NULL;
 
+    // 写入磁盘
+    DiskAccount da;
+    memcpy(da.acc_id, new_acc->acc_id, sizeof(da.acc_id));
+    memcpy(da.name, new_acc->name, sizeof(da.name));
+    memcpy(da.pwd_hash, new_acc->pwd_hash, sizeof(da.pwd_hash));
+    da.balance = new_acc->balance;
+    da.status = new_acc->status;
+    da.login_fail_count = new_acc->login_fail_count;
+
     FILE *fp = fopen(ACCOUNT_FILE, "ab");
     if (!fp)
     {
         free(new_acc);
         return 0;
     }
-    if (fwrite(new_acc, sizeof(Account), 1, fp) != 1)
+    if (fwrite(&da, sizeof(DiskAccount), 1, fp) != 1)
     {
         fclose(fp);
         free(new_acc);
