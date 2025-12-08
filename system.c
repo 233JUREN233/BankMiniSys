@@ -24,8 +24,8 @@ void system_init()
 // 系统保存
 void system_save()
 {
-    save_accounts;
-    save_transactions_to_file;
+    save_accounts();
+    save_transactions_to_file();
 }
 
 // 数据备份
