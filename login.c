@@ -84,7 +84,7 @@ int freeze(const char *acc_id)
         if (acc->status == ACC_FROZEN)
             return 3; // 已冻结
         acc->status = ACC_FROZEN;
-        save_accounts;
+        save_accounts();
         return 1; // 冻结成功
     }
 }
@@ -99,6 +99,6 @@ int unfreeze(const char *acc_id)
         return 2; // 账户已经是正常状态
     acc->status = ACC_NORMAL;
     acc->login_fail_count = 0;
-    save_accounts;
+    save_accounts();
     return 1; // 解冻成功
 }

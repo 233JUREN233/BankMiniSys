@@ -153,7 +153,11 @@ int close_account(const char *acc_id)
 }
 
 // 启动时加载账户
-int load_accounts(void);
+int load_accounts(void)
+{
+}
 
 // 保存所有账户到文件
-int save_accounts(void);
+int save_accounts(void)
+{
+}
