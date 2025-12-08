@@ -2,9 +2,9 @@
 #include<string.h>
 #include "global.h"
 #include "login.h"
-#define N 10
+#define MAX_ACCOUNTS 10
 
-Account accounts[N];//最多有N个账号
+Account accounts[MAX_ACCOUNTS];//最多有N个账号
 int account_count = 0;//当前帐号数量
 // 1.系统初始化：启动时加载备份数据
 void system_init() {
@@ -35,6 +35,7 @@ void system_init() {
     fclose(fp);
     printf("系统初始化：已加载 %d 条账号数据！\n", account_count);
 }
+
 // 2.数据备份：保存到文件
 void backup_data() {
     FILE *fp = fopen("bank_backup.txt", "w");
