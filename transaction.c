@@ -7,11 +7,18 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 // 校验金额是否合法
 static int isValidAmount(double amount)
 {
     return (amount > 0.0001) ? 1 : 0;
+}
+
+// 统一四舍五入到分
+static double round_to_cents(double value)
+{
+    return floor(value * 100.0 + 0.5) / 100.0;
 }
 
 // 获取当前时间
@@ -35,6 +42,7 @@ void createTransactionRecord(const char *acc_id, TransType type, double amount, 
     new_trans->acc_id[sizeof(new_trans->acc_id) - 1] = '\0';
     new_trans->type = type;
     new_trans->amount = amount;
+
     strncpy(new_trans->target_acc, target_acc ? target_acc : "", sizeof(new_trans->target_acc) - 1);
     new_trans->target_acc[sizeof(new_trans->target_acc) - 1] = '\0';
     getCurrentTime(new_trans->time, sizeof(new_trans->time));
@@ -77,6 +85,7 @@ int deposit(double amount, const char *trade_pwd)
         printf("存款失败:金额必须大于0!\n");
         return 4;
     }
+    amount = round_to_cents(amount);
     // 校验交易密码
     if (trade_pwd != NULL && !cmp_password(trade_pwd, curr_acc->pwd_hash))
     {
@@ -122,6 +131,7 @@ int withdraw(double amount, const char *trade_pwd)
         printf("取款失败:金额必须大于0!\n");
         return 4;
     }
+    amount = round_to_cents(amount);
     // 校验余额
     if (curr_acc->balance < amount)
     {
@@ -188,9 +198,10 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
         printf("转账失败:金额必须大于0!\n");
         return 6;
     }
+    amount = round_to_cents(amount);
     // 计算手续费和总扣款金额
-    double fee = amount * TRANS_FEE_RATE;
-    double total_deduct = amount + fee;
+    double fee = round_to_cents(amount * TRANS_FEE_RATE);
+    double total_deduct = round_to_cents(amount + fee);
     // 校验转出方余额
     if (from_acc->balance < total_deduct)
     {

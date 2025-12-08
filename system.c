@@ -17,7 +17,7 @@ void system_init()
     current_login_acc[0] = '\0';
 
     // 加载账户与交易记录
-    load_accounts();
+    load_accounts(ACCOUNT_FILE);
     load_transactions_from_file();
 }
 

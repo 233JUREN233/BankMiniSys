@@ -13,11 +13,81 @@
 #include "account.h"
 #include "system.h"
 
+// 清空输入缓冲，防止脏输入残留
+static void clear_input_buffer(void)
+{
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF)
+    {
+    }
+}
 
+// 安全读取整数，遇到非数字会提示并重试
+static int read_int(const char *prompt)
+{
+    int val;
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (scanf("%d", &val) == 1)
+        {
+            clear_input_buffer();
+            return val;
+        }
+        printf("输入无效，请输入数字。\n");
+        clear_input_buffer();
+    }
+}
 
+// 安全读取浮点数，遇到非法输入会提示并重试
+static double read_double(const char *prompt)
+{
+    double val;
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (scanf("%lf", &val) == 1)
+        {
+            clear_input_buffer();
+            return val;
+        }
+        printf("输入无效，请输入数字。\n");
+        clear_input_buffer();
+    }
+}
 
-
-
+// 读取一行文本（可含空格），去除尾部换行
+static void read_line(char *buf, size_t size, const char *prompt)
+{
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (!fgets(buf, (int)size, stdin))
+        {
+            clear_input_buffer();
+            continue;
+        }
+        size_t len = strlen(buf);
+        if (len && buf[len - 1] == '\n')
+        {
+            buf[len - 1] = '\0';
+        }
+        else
+        {
+            // 输入长度达到上限，丢弃剩余部分
+            clear_input_buffer();
+        }
+        if (buf[0] == '\0')
+        {
+            printf("输入不能为空，请重试。\n");
+            continue;
+        }
+        return;
+    }
+}
 
 // 主程序
 int main()
@@ -40,7 +110,7 @@ int main()
         while (1)
         {
             printf("请输入你的用户名：\n");
-            scanf("%s", id);
+            scanf("%19s", id);
             int login_result;
             do
             {
@@ -114,7 +184,7 @@ int main()
             {
                 char target[20];
                 printf("转入账号：");
-                scanf("%s", target);
+                scanf("%19s", target);
                 double amt = read_double("金额：");
                 transfer(target, amt, NULL);
             }
@@ -190,10 +260,9 @@ int main()
             if (choice == 1)
             {
                 char name[30], pwd[40], new_id[20];
-                printf("姓名：");
-                scanf("%s", name);
+                read_line(name, sizeof(name), "姓名：");
                 printf("密码：");
-                scanf("%s", pwd);
+                scanf("%39s", pwd);
                 double init = read_double("初始余额：");
                 if (create_account(name, pwd, init, new_id))
                 {
@@ -208,7 +277,7 @@ int main()
             {
                 char acc[20];
                 printf("账号：");
-                scanf("%s", acc);
+                scanf("%19s", acc);
                 if (freeze(acc) == 1)
                 {
                     printf("冻结成功\n");
@@ -220,7 +289,7 @@ int main()
             {
                 char acc[20];
                 printf("账号：");
-                scanf("%s", acc);
+                scanf("%19s", acc);
                 if (unfreeze(acc) == 1)
                 {
                     printf("解冻成功\n");
@@ -232,7 +301,7 @@ int main()
             {
                 char acc[20];
                 printf("账号：");
-                scanf("%s", acc);
+                scanf("%19s", acc);
                 if (lost(acc) == 1)
                 {
                     printf("挂失成功\n");

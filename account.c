@@ -207,7 +207,7 @@ int create_account(const char *name, const char *password, double initial_balanc
 int close_account(const char *acc_id)
 {
     Account *acc = find_account(acc_id);
-    if (acc = NULL)
+    if (acc == NULL)
     {
         printf("账户不存在！");
         return 0;
@@ -225,7 +225,7 @@ int close_account(const char *acc_id)
         return 3;
     }
 
-    if (remove_account(acc))
+    if (remove_account(acc->acc_id) == 0)
     {
         save_all_accounts(ACCOUNT_FILE);
         printf("销户成功！");
@@ -269,7 +269,7 @@ int save_all_accounts(const char *filename)
 double get_balance(const char *acc_id)
 {
     Account *acc = find_account(acc_id);
-    if (acc = NULL)
+    if (acc == NULL)
     {
         printf("未找到账户！");
         return -1;
@@ -331,8 +331,6 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
     strcpy(old_pwd_hash, acc->pwd_hash);
 
     // 3. 根据字段名修改
-    int success = 1;
-
     if (strcmp(field, "name") == 0)
     {
         // 修改姓名
@@ -418,4 +416,10 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
 
     printf(" 账户 %s 的 %s 已修改为：%s\n", acc_id, field, new_value);
     return 1;
+}
+
+// 保存账户到默认文件
+int save_accounts(void)
+{
+    return save_all_accounts(ACCOUNT_FILE);
 }
