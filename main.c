@@ -13,50 +13,11 @@
 #include "account.h"
 #include "system.h"
 
-// 清空输入缓冲，防止脏输入残留
-static void clear_input_buffer(void)
-{
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF)
-    {
-    }
-}
 
-// 安全读取整数，遇到非数字会提示并重试
-static int read_int(const char *prompt)
-{
-    int val;
-    for (;;)
-    {
-        if (prompt)
-            printf("%s", prompt);
-        if (scanf("%d", &val) == 1)
-        {
-            clear_input_buffer();
-            return val;
-        }
-        printf("输入无效，请输入数字。\n");
-        clear_input_buffer();
-    }
-}
 
-// 安全读取浮点数，遇到非法输入会提示并重试
-static double read_double(const char *prompt)
-{
-    double val;
-    for (;;)
-    {
-        if (prompt)
-            printf("%s", prompt);
-        if (scanf("%lf", &val) == 1)
-        {
-            clear_input_buffer();
-            return val;
-        }
-        printf("输入无效，请输入数字。\n");
-        clear_input_buffer();
-    }
-}
+
+
+
 
 // 主程序
 int main()

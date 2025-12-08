@@ -5,9 +5,11 @@
 #include "login.h"
 #include "account.h"
 
-// 账号递增计数器
+// 账号递增计数器与计数器文件
 static int g_account_counter = 10001;
+static const char *ACCOUNT_COUNTER_FILE = "account_counter.dat";
 
+// 磁盘存储结构
 typedef struct DiskAccount
 {
     char acc_id[20];
@@ -16,18 +18,7 @@ typedef struct DiskAccount
     double balance;
     AccountStatus status;
     int login_fail_count;
-static int g_account_counter = 10001;
-static const char *ACCOUNT_COUNTER_FILE = "account_counter.dat";
-
-// 计算哈希值
-int hash_acc_id(const char *acc_id)
-{
-    unsigned int hash = 0;
-
-    for (int i = 0; acc_id[i] != '\0'; i++)
-    {
-        hash = hash * 131 + (unsigned char)acc_id[i];
-    }
+} DiskAccount;
 
 // 从文件加载计数器；若不存在返回 -1
 static int load_counter_from_file(void)
@@ -51,6 +42,17 @@ static void save_counter_to_file(int counter)
     fwrite(&counter, sizeof(int), 1, fp);
     fclose(fp);
 }
+
+// 计算哈希值
+int hash_acc_id(const char *acc_id)
+{
+    unsigned int hash = 0;
+
+    for (int i = 0; acc_id[i] != '\0'; i++)
+    {
+        hash = hash * 131 + (unsigned char)acc_id[i];
+    }
+
     return hash % HASH_SIZE;
 }
 
@@ -135,12 +137,12 @@ int create_account(const char *name, const char *password, double initial_balanc
     if (!name || !password || initial_balance < 0)
     {
         return 0;
-        // 没有账户文件也尝试加载计数器
-        int persisted = load_counter_from_file();
-        if (persisted > 0)
-        {
-            g_account_counter = persisted;
-        }
+    }
+
+    int persisted = load_counter_from_file();
+    if (persisted > g_account_counter)
+    {
+        g_account_counter = persisted;
     }
 
     char new_id[20];
@@ -149,17 +151,6 @@ int create_account(const char *name, const char *password, double initial_balanc
     if (find_account(new_id) != NULL)
     {
         return 0;
-    }
-    // 读取持久化计数器，取更大值防倒退
-    int persisted = load_counter_from_file();
-    if (persisted > g_account_counter)
-    {
-        g_account_counter = persisted;
-    }
-    else
-    {
-        // 更新持久化文件，保证计数与现有账号最大值一致
-        save_counter_to_file(g_account_counter);
     }
 
     Account *new_acc = malloc(sizeof(Account));
@@ -202,6 +193,8 @@ int create_account(const char *name, const char *password, double initial_balanc
 
     insert_account(new_acc);
 
+    save_counter_to_file(g_account_counter);
+
     if (generated_id)
     {
         strcpy(generated_id, new_id);
@@ -213,15 +206,101 @@ int create_account(const char *name, const char *password, double initial_balanc
 // 销户
 int close_account(const char *acc_id)
 {
-    return remove_account(acc_id);
+    int ret = remove_account(acc_id);
+    if (ret == 0)
+    {
+        save_accounts();
+    }
+    return ret;
 }
 
 // 启动时加载账户
 int load_accounts(void)
 {
+    FILE *fp = fopen(ACCOUNT_FILE, "rb");
+    if (!fp)
+    {
+        int persisted = load_counter_from_file();
+        if (persisted > 0)
+        {
+            g_account_counter = persisted;
+        }
+        return 1; // 没有文件视作成功加载0个
+    }
+
+    DiskAccount da;
+    while (fread(&da, sizeof(DiskAccount), 1, fp) == 1)
+    {
+        Account *acc = malloc(sizeof(Account));
+        if (!acc)
+        {
+            fclose(fp);
+            return 0;
+        }
+        memcpy(acc->acc_id, da.acc_id, sizeof(acc->acc_id));
+        memcpy(acc->name, da.name, sizeof(acc->name));
+        memcpy(acc->pwd_hash, da.pwd_hash, sizeof(acc->pwd_hash));
+        acc->balance = da.balance;
+        acc->status = da.status;
+        acc->login_fail_count = da.login_fail_count;
+        acc->next = NULL;
+        insert_account(acc);
+
+        if (strncmp(acc->acc_id, ACCOUNT_PREFIX, strlen(ACCOUNT_PREFIX)) == 0)
+        {
+            const char *suffix = acc->acc_id + strlen(ACCOUNT_PREFIX);
+            int num = atoi(suffix);
+            if (num >= g_account_counter)
+            {
+                g_account_counter = num + 1;
+            }
+        }
+    }
+    fclose(fp);
+
+    int persisted = load_counter_from_file();
+    if (persisted > g_account_counter)
+    {
+        g_account_counter = persisted;
+    }
+    else
+    {
+        // 更新持久化文件，保证计数与现有账号最大值一致
+        save_counter_to_file(g_account_counter);
+    }
+    return 1;
 }
 
 // 保存所有账户到文件
 int save_accounts(void)
 {
+    FILE *fp = fopen(ACCOUNT_FILE, "wb");
+    if (!fp)
+    {
+        return 0;
+    }
+
+    for (int i = 0; i < HASH_SIZE; i++)
+    {
+        Account *curr = acc_hash[i];
+        while (curr)
+        {
+            DiskAccount da;
+            memcpy(da.acc_id, curr->acc_id, sizeof(da.acc_id));
+            memcpy(da.name, curr->name, sizeof(da.name));
+            memcpy(da.pwd_hash, curr->pwd_hash, sizeof(da.pwd_hash));
+            da.balance = curr->balance;
+            da.status = curr->status;
+            da.login_fail_count = curr->login_fail_count;
+            fwrite(&da, sizeof(DiskAccount), 1, fp);
+            curr = curr->next;
+        }
+    }
+
+    fclose(fp);
+
+    // 也持久化计数器，防止倒退
+    save_counter_to_file(g_account_counter);
+
+    return 1;
 }
