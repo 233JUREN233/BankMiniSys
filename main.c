@@ -129,6 +129,7 @@ int main()
                 else if (login_result == 3)
                 {
                     printf("账户已被锁定，请联系管理员进行解锁\n");
+                    system("pause");
                     return 0;
                 }
             } while (login_result != 1);
@@ -332,4 +333,5 @@ int main()
     // 释放内存
     free_all_transactions();
     free_all_accounts();
+    system("pause");
 }
