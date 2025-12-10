@@ -42,3 +42,69 @@
 - 辅助：系统初始化（启动时加载数据）
 
 ---
+
+## 流程图
+
+```mermaid
+flowchart TD
+    start([启动]) --> init[系统初始化<br/>加载账户/交易]
+    init --> choice{选择身份}
+    choice --> user[用户登录<br/>密码校验/冻结检查]
+    choice --> admin[管理员登录]
+    user --> menuU{用户菜单}
+    menuU --> bal[查询余额]
+    menuU --> dep[存款]
+    menuU --> wd[取款]
+    menuU --> tf[转账]
+    menuU --> qtrans[查询交易记录]
+    menuU --> exitU([退出，保存])
+    admin --> menuA{管理员菜单}
+    menuA --> open[开户]
+    menuA --> frz[冻结/解冻/挂失]
+    menuA --> backup[备份数据]
+    menuA --> exitA([退出，保存])
+    exitU --> save([保存并退出])
+    exitA --> save
+```
+
+---
+
+```mermaid
+flowchart TD
+    tf_start([转账请求]) --> v_login{是否已登录}
+    v_login -->|否| fail_login[拒绝]
+    v_login -->|是| v_state{账户状态正常?}
+    v_state -->|否| fail_state[拒绝]
+    v_state -->|是| v_amt{金额有效?}
+    v_amt -->|否| fail_amt[拒绝]
+    v_amt -->|是| calc[计算手续费与合计扣款]
+    calc --> v_bal{余额足够?}
+    v_bal -->|否| fail_bal[拒绝]
+    v_bal -->|是| apply[扣款+入账，写交易记录]
+    apply --> ok[成功返回]
+```
+
+---
+
+## 编译与运行
+
+```bash
+gcc -std=c11 -Wall -Wextra -O2 main.c account.c login.c md5.c render.c system.c transaction.c bill.c global.c db.c sqlite3.c -o BankMiniSys.exe
+```
+
+
+## 架构图
+
+```mermaid
+flowchart TD
+  UI[UI/main] --> SYS[system.c\ninit/load]
+  SYS --> LOGIN[login.c]
+  SYS --> ACC[account.c\ncache+DB]
+  LOGIN <--> ACC
+  ACC --> TX[transaction.c\n]
+  TX --> BILL[bill.c\n]
+  ACC --> DB[db.c\nSQLite/WAL]
+  TX --> DB
+  BILL --> DB
+  DB --> SQLITE[SQLite\naccounts/tx/seq]
+```
