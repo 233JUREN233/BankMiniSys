@@ -8,6 +8,11 @@
 // 清空输入缓存
 void clear_input_buffer(void);
 
+// 简单美化输出
+void print_divider(void);
+void print_title(const char *title);
+void print_section(const char *title);
+
 // 安全读取整数/浮点/文本
 int read_int(const char *prompt);
 double read_double(const char *prompt);

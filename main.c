@@ -22,9 +22,11 @@ int main()
     system_init();
 
     // 选择登录身份
-    printf("欢迎登录BankMiniSys!\n");
-    printf("请选择你的身份:\n");
-    printf("1.用户 2.管理员\n");
+    print_title("欢迎登录 BankMiniSys");
+    print_section("请选择你的身份");
+    printf("1. 用户\n");
+    printf("2. 管理员\n");
+    print_divider();
     int situation = read_int("请选择：");
 
     // 用户身份登录
@@ -70,7 +72,7 @@ int main()
         // 用户功能菜单
         while (1)
         {
-            printf("\n用户菜单：\n");
+            print_section("用户菜单");
             printf("1. 查询余额\n");
             printf("2. 存款\n");
             printf("3. 取款\n");
@@ -79,6 +81,7 @@ int main()
             printf("6. 挂失\n");
             printf("7. 解冻/解挂\n");
             printf("0. 退出\n");
+            print_divider();
             int choice = read_int("请选择：");
 
             if (choice == 0)
@@ -174,13 +177,14 @@ int main()
         // 管理员菜单
         while (1)
         {
-            printf("\n管理员菜单：\n");
+            print_section("管理员菜单");
             printf("1. 开户\n");
             printf("2. 冻结账户\n");
             printf("3. 解冻账户\n");
             printf("4. 挂失账户\n");
             printf("5. 备份数据\n");
             printf("0. 退出\n");
+            print_divider();
             int choice = read_int("请选择：");
             if (choice == 0)
                 break;

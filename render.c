@@ -2,6 +2,32 @@
 #include "render.h"
 #include "account.h"
 
+static void print_line(char ch, int count)
+{
+    for (int i = 0; i < count; i++)
+        putchar(ch);
+    putchar('\n');
+}
+
+void print_divider(void)
+{
+    print_line('-', 40);
+}
+
+void print_title(const char *title)
+{
+    print_line('=', 40);
+    printf("%s\n", title ? title : "");
+    print_line('=', 40);
+}
+
+void print_section(const char *title)
+{
+    print_line('-', 40);
+    if (title && *title)
+        printf("%s\n", title);
+}
+
 // 清空输入缓存
 void clear_input_buffer(void)
 {
