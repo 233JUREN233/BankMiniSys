@@ -26,12 +26,6 @@ void reload_accounts_cache(void);
 // 保存全部账户
 int save_accounts(void);
 
-// 从文件加载计数器，不存在则返回 -1
-static int load_counter_from_file(void);
-
-// 将计数器写入文件
-static void save_counter_to_file(int counter);
-
 // 开户(0失败/1成功)
 int create_account(const char *name, const char *password, double initial_balance, char *generated_id);
 
