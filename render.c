@@ -1,5 +1,81 @@
+#include <string.h>
 #include "render.h"
 #include "account.h"
+
+// 清空输入缓存
+void clear_input_buffer(void)
+{
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF)
+    {
+    }
+}
+
+// 安全读取整数
+int read_int(const char *prompt)
+{
+    int val;
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (scanf("%d", &val) == 1)
+        {
+            clear_input_buffer();
+            return val;
+        }
+        printf("输入无效，请输入数字。\n");
+        clear_input_buffer();
+    }
+}
+
+// 安全读取浮点数
+double read_double(const char *prompt)
+{
+    double val;
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (scanf("%lf", &val) == 1)
+        {
+            clear_input_buffer();
+            return val;
+        }
+        printf("输入无效，请输入数字。\n");
+        clear_input_buffer();
+    }
+}
+
+// 读取一行文本，去除尾部换行
+void read_line(char *buf, size_t size, const char *prompt)
+{
+    for (;;)
+    {
+        if (prompt)
+            printf("%s", prompt);
+        if (!fgets(buf, (int)size, stdin))
+        {
+            clear_input_buffer();
+            continue;
+        }
+        size_t len = strlen(buf);
+        if (len && buf[len - 1] == '\n')
+        {
+            buf[len - 1] = '\0';
+        }
+        else
+        {
+            clear_input_buffer();
+        }
+        if (buf[0] == '\0')
+        {
+            printf("输入不能为空，请重试。\n");
+            continue;
+        }
+        return;
+    }
+}
 
 void get_password(char *pwd, int maxlen)
 {
@@ -10,16 +86,15 @@ void get_password(char *pwd, int maxlen)
         ch = _getch(); // 输入但不显示
         if (ch == '\r' || ch == '\n')
         {
-            // 回车结束qq
             break;
         }
         else if (ch == '\b' && i > 0)
-        { // 处理退格
+        {
             i--;
             printf("\b \b");
         }
         else if (ch >= 32 && ch <= 126)
-        { // 可见字符
+        {
             pwd[i++] = ch;
             printf("*");
         }

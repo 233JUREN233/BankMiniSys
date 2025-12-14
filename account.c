@@ -9,18 +9,7 @@
 static int g_account_counter = 10001;
 static const char *ACCOUNT_COUNTER_FILE = "account_counter.dat";
 
-// 存储结构体
-typedef struct DiskAccount
-{
-    char acc_id[20];
-    char name[30];
-    char pwd_hash[33];
-    double balance;
-    AccountStatus status;
-    int login_fail_count;
-} DiskAccount;
-
-// 从文件加载计数器
+// 从文件加载计数器；若不存在返回 -1
 static int load_counter_from_file(void)
 {
     FILE *fp = fopen(ACCOUNT_COUNTER_FILE, "rb");
@@ -176,21 +165,16 @@ int create_account(const char *name, const char *password, double initial_balanc
     new_acc->login_fail_count = 0;
     new_acc->next = NULL;
 
-    DiskAccount da;
-    memcpy(da.acc_id, new_acc->acc_id, sizeof(da.acc_id));
-    memcpy(da.name, new_acc->name, sizeof(da.name));
-    memcpy(da.pwd_hash, new_acc->pwd_hash, sizeof(da.pwd_hash));
-    da.balance = new_acc->balance;
-    da.status = new_acc->status;
-    da.login_fail_count = new_acc->login_fail_count;
-
+    // 写入磁盘（去除 next 指针）
+    Account temp = *new_acc;
+    temp.next = NULL;
     FILE *fp = fopen(ACCOUNT_FILE, "ab");
     if (!fp)
     {
         free(new_acc);
         return 0;
     }
-    if (fwrite(&da, sizeof(DiskAccount), 1, fp) != 1)
+    if (fwrite(&temp, sizeof(Account), 1, fp) != 1)
     {
         fclose(fp);
         free(new_acc);
@@ -272,20 +256,6 @@ int save_all_accounts(const char *filename)
     fclose(fp);
 
     return count;
-}
-
-// 查询余额
-double get_balance(const char *acc_id)
-{
-    Account *acc = find_account(acc_id);
-    if (acc == NULL)
-    {
-        printf("未找到账户！");
-        return -1;
-    }
-
-    double account_balance = acc->balance;
-    return account_balance;
 }
 
 // 读取文件

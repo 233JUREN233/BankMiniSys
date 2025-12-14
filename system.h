@@ -1,3 +1,6 @@
+#ifndef SYSTEM_H
+#define SYSTEM_H
+
 #include <stdio.h>
 #include <string.h>
 #include "global.h"
@@ -11,3 +14,5 @@ void system_save();
 
 // 数据备份函数
 void backup_data();
+
+#endif

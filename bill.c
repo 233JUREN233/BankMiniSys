@@ -3,7 +3,7 @@
 #include "bill.h"
 #include "transaction.h"
 
-// 重新加载交易记录，确保使用最新数据
+// 重新加载交易记录
 void reload_transactions_cache(void)
 {
     free_all_transactions();

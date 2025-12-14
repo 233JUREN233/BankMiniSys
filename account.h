@@ -44,12 +44,10 @@ int close_account(const char *acc_id);
 // 保存所有账户信息(失败-1/成功返回保存文件的个数)
 int save_all_accounts(const char *filename);
 
-// 查询余额
-double get_balance(const char *acc_id);
-
 // 修改账户信息
 int update_account_info(const char *acc_id, const char *field, const char *new_value);
 
 // 读取文件
 int load_accounts(const char *filename);
+
 #endif
