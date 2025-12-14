@@ -8,7 +8,7 @@
 // 清空输入缓存
 void clear_input_buffer(void);
 
-// 简单美化输出
+// 美化输出
 void print_divider(void);
 void print_title(const char *title);
 void print_section(const char *title);

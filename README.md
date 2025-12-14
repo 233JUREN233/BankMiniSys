@@ -47,41 +47,62 @@
 
 ```mermaid
 flowchart TD
-    start([启动]) --> init[系统初始化<br/>加载账户/交易]
-    init --> choice{选择身份}
-    choice --> user[用户登录<br/>密码校验/冻结检查]
-    choice --> admin[管理员登录]
-    user --> menuU{用户菜单}
-    menuU --> bal[查询余额]
-    menuU --> dep[存款]
-    menuU --> wd[取款]
-    menuU --> tf[转账]
-    menuU --> qtrans[查询交易记录]
-    menuU --> exitU([退出，保存])
-    admin --> menuA{管理员菜单}
-    menuA --> open[开户]
-    menuA --> frz[冻结/解冻/挂失]
-    menuA --> backup[备份数据]
-    menuA --> exitA([退出，保存])
-    exitU --> save([保存并退出])
-    exitA --> save
+  start([启动]) --> init[系统初始化<br/>加载账户/交易数据]
+  init --> choice{选择身份}
+
+  choice --> user_login[用户登录]
+  choice --> admin_login[管理员登录]
+
+  user_login --> v_user{密码校验 / 冻结校验}
+  v_user -->|失败| block_user[拒绝登录 / 锁定] --> choice
+  v_user -->|通过| menu_u{用户菜单}
+
+  menu_u --> bal[查询余额]
+  menu_u --> dep[存款]
+  menu_u --> wd[取款]
+  menu_u --> tf[转账]
+  menu_u --> hist[查询交易记录]
+  menu_u --> lost[挂失/解挂]
+  menu_u --> exit_u([退出])
+  bal --> menu_u
+  dep --> menu_u
+  wd --> menu_u
+  tf --> menu_u
+  hist --> menu_u
+  lost --> menu_u
+
+  admin_login --> v_admin{管理员校验}
+  v_admin -->|失败| block_admin[拒绝登录] --> choice
+  v_admin -->|通过| menu_a{管理员菜单}
+
+  menu_a --> open[开户]
+  menu_a --> freeze[冻结/解冻]
+  menu_a --> backup[备份数据]
+  menu_a --> exit_a([退出])
+  open --> menu_a
+  freeze --> menu_a
+  backup --> menu_a
+
+  exit_u --> save[保存数据并退出]
+  exit_a --> save
 ```
 
 ---
 
 ```mermaid
 flowchart TD
-    tf_start([转账请求]) --> v_login{是否已登录}
-    v_login -->|否| fail_login[拒绝]
-    v_login -->|是| v_state{账户状态正常?}
-    v_state -->|否| fail_state[拒绝]
-    v_state -->|是| v_amt{金额有效?}
-    v_amt -->|否| fail_amt[拒绝]
-    v_amt -->|是| calc[计算手续费与合计扣款]
-    calc --> v_bal{余额足够?}
-    v_bal -->|否| fail_bal[拒绝]
-    v_bal -->|是| apply[扣款+入账，写交易记录]
-    apply --> ok[成功返回]
+  start_tf([发起交易]) --> v_login{登录状态}
+  v_login -->|未登录| deny_login[拒绝]
+  v_login -->|已登录| v_state{账户状态正常?}
+  v_state -->|冻结/挂失| deny_state[拒绝]
+  v_state -->|正常| v_amount{金额合法?}
+  v_amount -->|无效| deny_amount[拒绝]
+  v_amount -->|有效| calc[计算手续费+合计扣款]
+  calc --> v_balance{余额足够?}
+  v_balance -->|不足| deny_balance[拒绝]
+  v_balance -->|足够| apply[扣款/入账]
+  apply --> log[写交易记录]
+  log --> ok[完成返回]
 ```
 
 ---
@@ -92,19 +113,47 @@ flowchart TD
 gcc -std=c11 -Wall -Wextra -O2 main.c account.c login.c md5.c render.c system.c transaction.c bill.c global.c -o BankMiniSys.exe
 ```
 
-
 ## 架构图
 
 ```mermaid
-flowchart TD
-  UI[UI/main] --> SYS[system.c\ninit/load]
-  SYS --> LOGIN[login.c]
-  SYS --> ACC[account.c\ncache+DB]
-  LOGIN <--> ACC
-  ACC --> TX[transaction.c\n]
-  TX --> BILL[bill.c\n]
-  ACC --> DB[db.c\nSQLite/WAL]
-  TX --> DB
-  BILL --> DB
-  DB --> SQLITE[SQLite\naccounts/tx/seq]
+flowchart TB
+  subgraph UI[界面层]
+    MAIN[main.c<br/>菜单/交互]
+  end
+
+  subgraph APP[业务层]
+    SYS[system.c<br/>启动/持久化]
+    LOGIN[login.c<br/>认证/锁定]
+    ACC[account.c<br/>账户管理]
+    TX[transaction.c<br/>存取/转账]
+    BILL[bill.c<br/>流水记录]
+    MD5[md5.c<br/>哈希]
+    RENDER[render.c<br/>输入/输出样式]
+  end
+
+  subgraph DATA[数据层]
+    STORAGE[文件存储 / 备份]
+  end
+
+  MAIN --> SYS
+  MAIN --> LOGIN
+  MAIN --> ACC
+  MAIN --> TX
+  MAIN --> BILL
+
+  SYS --> ACC
+  SYS --> TX
+  SYS --> BILL
+
+  LOGIN --> ACC
+  ACC --> TX
+  TX --> BILL
+
+  ACC --> STORAGE
+  TX --> STORAGE
+  BILL --> STORAGE
+  SYS --> STORAGE
+
+  LOGIN --> MD5
+  MAIN --> RENDER
 ```
