@@ -28,6 +28,8 @@ int cmp_password(const char *input, const char *password)
 // 登录验证
 int login(const char *acc_id, const char *pwd)
 {
+    reload_accounts_cache();
+
     Account *acc = find_account(acc_id);
     if (acc == NULL)
         return 0; // 账号并不存在
@@ -56,6 +58,8 @@ int login(const char *acc_id, const char *pwd)
 // 挂失
 int lost(const char *acc_id)
 {
+    reload_accounts_cache();
+
     Account *acc = find_account(acc_id);
     if (acc == NULL)
         return 0; // 账号不存在
@@ -74,6 +78,8 @@ int lost(const char *acc_id)
 // 冻结
 int freeze(const char *acc_id)
 {
+    reload_accounts_cache();
+
     Account *acc = find_account(acc_id);
     if (acc == NULL)
         return 0; // 账号不存在
@@ -92,6 +98,8 @@ int freeze(const char *acc_id)
 // 解冻(挂失和冻结共用)
 int unfreeze(const char *acc_id)
 {
+    reload_accounts_cache();
+
     Account *acc = find_account(acc_id);
     if (acc == NULL)
         return 0; // 账号不存在

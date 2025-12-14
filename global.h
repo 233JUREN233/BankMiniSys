@@ -54,3 +54,4 @@ extern Transaction *trans_head;      // 交易记录链表头（账单模块核�
 extern char current_login_acc[20];   // 当前登录账号（空字符串=未登录，全模块共用）
 
 #endif // GLOBAL_H
+

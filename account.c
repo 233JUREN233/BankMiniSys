@@ -5,11 +5,11 @@
 #include "login.h"
 #include "account.h"
 
-// 账号递增计数器与计数器文件
+// 账号递增counter
 static int g_account_counter = 10001;
 static const char *ACCOUNT_COUNTER_FILE = "account_counter.dat";
 
-// 磁盘存储结构
+// 存储结构体
 typedef struct DiskAccount
 {
     char acc_id[20];
@@ -20,7 +20,7 @@ typedef struct DiskAccount
     int login_fail_count;
 } DiskAccount;
 
-// 从文件加载计数器；若不存在返回 -1
+// 从文件加载计数器
 static int load_counter_from_file(void)
 {
     FILE *fp = fopen(ACCOUNT_COUNTER_FILE, "rb");
@@ -97,12 +97,12 @@ int remove_account(const char *acc_id)
             else
                 acc_hash[idx] = curr->next;
             free(curr);
-            return 0; // 成功返回0
+            return 0;
         }
         prev = curr;
         curr = curr->next;
     }
-    return 1; // 失败返回1
+    return 1;
 }
 
 // 释放全部账户链表
@@ -121,6 +121,13 @@ void free_all_accounts(void)
     }
 }
 
+// 重新加载账户缓存
+void reload_accounts_cache(void)
+{
+    free_all_accounts();
+    load_accounts(ACCOUNT_FILE);
+}
+
 // 生成id
 void generate_account_id(char *acc_id, size_t size)
 {
@@ -131,13 +138,14 @@ void generate_account_id(char *acc_id, size_t size)
     }
 }
 
-// 开户(返回0失败，返回1成功)
+// 开户
 int create_account(const char *name, const char *password, double initial_balance, char *generated_id)
 {
     if (!name || !password || initial_balance < 0)
     {
         return 0;
     }
+    reload_accounts_cache();
 
     int persisted = load_counter_from_file();
     if (persisted > g_account_counter)
@@ -168,7 +176,6 @@ int create_account(const char *name, const char *password, double initial_balanc
     new_acc->login_fail_count = 0;
     new_acc->next = NULL;
 
-    // 写入磁盘
     DiskAccount da;
     memcpy(da.acc_id, new_acc->acc_id, sizeof(da.acc_id));
     memcpy(da.name, new_acc->name, sizeof(da.name));
@@ -206,6 +213,8 @@ int create_account(const char *name, const char *password, double initial_balanc
 // 销户
 int close_account(const char *acc_id)
 {
+    reload_accounts_cache();
+
     Account *acc = find_account(acc_id);
     if (acc == NULL)
     {
@@ -236,7 +245,7 @@ int close_account(const char *acc_id)
     return 4;
 }
 
-// 全量保存文件 （每次更新账户信息后保存所有账户信息（覆盖））,失败返回-1，成功返回保存文件的个数
+// 保存所有账户信息
 int save_all_accounts(const char *filename)
 {
     FILE *fp = fopen(filename, "wb");
@@ -313,7 +322,8 @@ int load_accounts(const char *filename)
 // 修改账号信息
 int update_account_info(const char *acc_id, const char *field, const char *new_value)
 {
-    // 1. 查找账户
+    reload_accounts_cache();
+
     Account *acc = find_account(acc_id);
     if (acc == NULL)
     {
@@ -321,7 +331,6 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
         return 0;
     }
 
-    // 2. 备份旧值（用于回滚）
     char old_name[30] = "";
     char old_pwd_hash[33] = "";
     double old_balance = acc->balance;
@@ -330,10 +339,8 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
     strcpy(old_name, acc->name);
     strcpy(old_pwd_hash, acc->pwd_hash);
 
-    // 3. 根据字段名修改
     if (strcmp(field, "name") == 0)
     {
-        // 修改姓名
         if (strlen(new_value) >= sizeof(acc->name))
         {
             printf("错误：姓名太长\n");
@@ -343,14 +350,12 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
     }
     else if (strcmp(field, "password") == 0)
     {
-        // 修改密码（需要加密）
         char encrypted[33];
         password_md5(new_value, encrypted);
         strcpy(acc->pwd_hash, encrypted);
     }
     else if (strcmp(field, "balance") == 0)
     {
-        // 修改余额
         double new_balance = atof(new_value);
         if (new_balance < 0)
         {
@@ -361,11 +366,10 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
     }
     else if (strcmp(field, "status") == 0)
     {
-        // 修改状态
         if (strcmp(new_value, "正常") == 0 || strcmp(new_value, "0") == 0)
         {
             acc->status = ACC_NORMAL;
-            acc->login_fail_count = 0; // 重置登录失败次数
+            acc->login_fail_count = 0;
         }
         else if (strcmp(new_value, "冻结") == 0 || strcmp(new_value, "1") == 0)
         {
@@ -388,10 +392,8 @@ int update_account_info(const char *acc_id, const char *field, const char *new_v
         return 0;
     }
 
-    // 4. 保存到文件
     if (save_all_accounts(ACCOUNT_FILE) <= 0)
     {
-        // 保存失败，回滚修改
         printf("错误：保存失败，已恢复原值\n");
 
         if (strcmp(field, "name") == 0)

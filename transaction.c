@@ -32,6 +32,8 @@ static void getCurrentTime(char *time_buf, int buf_len)
 // 生成交易记录
 void createTransactionRecord(const char *acc_id, TransType type, double amount, const char *target_acc)
 {
+    reload_transactions_cache();
+
     Transaction *new_trans = (Transaction *)malloc(sizeof(Transaction));
     if (new_trans == NULL)
     {
@@ -65,6 +67,8 @@ int deposit(double amount, const char *trade_pwd)
         printf("存款失败：请先登录！\n");
         return 1;
     }
+    // 操作前刷新最新账户数据
+    reload_accounts_cache();
     // 查找账户
     Account *curr_acc = find_account(current_login_acc);
     if (curr_acc == NULL)
@@ -111,6 +115,8 @@ int withdraw(double amount, const char *trade_pwd)
         printf("取款失败：请先登录！\n");
         return 1;
     }
+    // 操作前刷新最新账户数据
+    reload_accounts_cache();
     // 查找账户
     Account *curr_acc = find_account(current_login_acc);
     if (curr_acc == NULL)
@@ -164,6 +170,8 @@ int transfer(const char *target_acc_id, double amount, const char *trade_pwd)
         printf("转账失败：请先登录！\n");
         return 1;
     }
+    // 操作前刷新最新账户数据
+    reload_accounts_cache();
     // 查找转出账户
     Account *from_acc = find_account(current_login_acc);
     if (from_acc == NULL)

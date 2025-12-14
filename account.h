@@ -14,16 +14,25 @@ Account *find_account(const char *acc_id);
 // 按哈希值插入账户节点
 void insert_account(Account *acc);
 
-// 删除账号（返回 1：失败 0：成功）
+// 删除账号（1失败/0成功）
 int remove_account(const char *acc_id);
 
-// 释放全部账户链表（程序退出时调用，防止leak）
+// 释放全部账户链表
 void free_all_accounts(void);
 
-// 保存全部账户到默认文件
+// 重新加载账户缓存
+void reload_accounts_cache(void);
+
+// 保存全部账户
 int save_accounts(void);
 
-// 开户
+// 从文件加载计数器，不存在则返回 -1
+static int load_counter_from_file(void);
+
+// 将计数器写入文件
+static void save_counter_to_file(int counter);
+
+// 开户(0失败/1成功)
 int create_account(const char *name, const char *password, double initial_balance, char *generated_id);
 
 // 生成id
@@ -32,10 +41,13 @@ void generate_account_id(char *acc_id, size_t size);
 // 销户
 int close_account(const char *acc_id);
 
-// 全量保存文件 （每次更新账户信息后保存所有账户信息（覆盖））,失败返回-1，成功返回保存文件的个数
+// 保存所有账户信息(失败-1/成功返回保存文件的个数)
 int save_all_accounts(const char *filename);
 
-// 修改账户基本信息
+// 查询余额
+double get_balance(const char *acc_id);
+
+// 修改账户信息
 int update_account_info(const char *acc_id, const char *field, const char *new_value);
 
 // 读取文件

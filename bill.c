@@ -3,6 +3,13 @@
 #include "bill.h"
 #include "transaction.h"
 
+// 重新加载交易记录，确保使用最新数据
+void reload_transactions_cache(void)
+{
+    free_all_transactions();
+    load_transactions_from_file();
+}
+
 // 按账号查询交易记录并展示
 void query_transactions(const char *acc_id)
 {

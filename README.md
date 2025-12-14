@@ -89,7 +89,7 @@ flowchart TD
 ## 编译与运行
 
 ```bash
-gcc -std=c11 -Wall -Wextra -O2 main.c account.c login.c md5.c render.c system.c transaction.c bill.c global.c db.c sqlite3.c -o BankMiniSys.exe
+gcc -std=c11 -Wall -Wextra -O2 main.c account.c login.c md5.c render.c system.c transaction.c bill.c global.c -o BankMiniSys.exe
 ```
 
 

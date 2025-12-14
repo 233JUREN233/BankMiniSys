@@ -7,6 +7,9 @@
 // 按账号查询交易记录并展示
 void query_transactions(const char *acc_id);
 
+// 重新加载交易记录（先清空再读文件）
+void reload_transactions_cache(void);
+
 // 从文件加载交易记录（系统初始化时调用）
 void load_transactions_from_file();
 
